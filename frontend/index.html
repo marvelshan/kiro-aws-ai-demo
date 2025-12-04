@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="簡單的部落格系統，展示 Markdown 文章">
+    <meta name="author" content="">
+    <title>部落格</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <!-- Main container -->
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <h1 class="site-title">
+                    <a href="#/" id="home-link">我的部落格</a>
+                </h1>
+            </div>
+        </header>
+
+        <!-- Main content area - dynamically populated -->
+        <main class="main-content">
+            <div class="container" id="content">
+                <!-- Article list or article detail will be rendered here -->
+                <div class="loading">載入中...</div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 我的部落格. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Templates for dynamic content -->
+    
+    <!-- Article list template -->
+    <template id="article-list-template">
+        <div class="article-list">
+            <h2 class="page-title">所有文章</h2>
+            <div id="articles-container">
+                <!-- Articles will be inserted here -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Article list item template -->
+    <template id="article-item-template">
+        <article class="article-item">
+            <h3 class="article-title">
+                <a href="#" class="article-link"></a>
+            </h3>
+            <time class="article-date"></time>
+        </article>
+    </template>
+
+    <!-- Article detail template -->
+    <template id="article-detail-template">
+        <article class="article-detail">
+            <div class="article-header">
+                <h2 class="article-title"></h2>
+                <time class="article-date"></time>
+            </div>
+            <div class="article-content">
+                <!-- Markdown content will be rendered here -->
+            </div>
+            <nav class="article-nav">
+                <a href="#/" class="back-link">← 返回文章列表</a>
+            </nav>
+        </article>
+    </template>
+
+    <!-- Error template -->
+    <template id="error-template">
+        <div class="error-message">
+            <h2 class="error-title"></h2>
+            <p class="error-text"></p>
+            <button class="retry-button" style="display: none;">重試</button>
+            <a href="#/" class="back-link">返回首頁</a>
+        </div>
+    </template>
+
+    <!-- Empty state template -->
+    <template id="empty-state-template">
+        <div class="empty-state">
+            <h2>目前還沒有文章</h2>
+            <p>敬請期待更多精彩內容</p>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

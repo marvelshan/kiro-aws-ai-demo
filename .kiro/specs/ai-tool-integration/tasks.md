@@ -49,21 +49,21 @@
     - Test file read errors
     - _Requirements: 4.1-4.5_
 
-- [ ] 3. Build frontend application structure
-  - [ ] 3.1 Create HTML template
+- [x] 3. Build frontend application structure
+  - [x] 3.1 Create HTML template
     - Write index.html with basic structure
     - Include meta tags for responsive design
     - Add placeholders for dynamic content
     - _Requirements: 5.1-5.4_
   
-  - [ ] 3.2 Set up CSS styling
+  - [x] 3.2 Set up CSS styling
     - Create responsive layout styles
     - Define typography and spacing
     - Add mobile-first media queries
     - Style article list and detail views
     - _Requirements: 3.5, 5.1-5.4_
   
-  - [ ] 3.3 Implement router module
+  - [x] 3.3 Implement router module
     - Create simple hash-based or history API router
     - Handle routes: / (list) and /article/:id (detail)
     - Implement navigation functions
@@ -73,8 +73,8 @@
     - **Property 3: Article navigation generates correct URL**
     - **Validates: Requirements 2.1**
 
-- [ ] 4. Implement article list view
-  - [ ] 4.1 Create article list component
+- [x] 4. Implement article list view
+  - [x] 4.1 Create article list component
     - Fetch articles/list.json from S3
     - Render article list with title and date
     - Handle empty state

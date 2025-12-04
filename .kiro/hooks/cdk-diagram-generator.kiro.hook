@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "name": "CDK Architecture Diagram Generator",
+  "description": "Monitors CDK infrastructure files for changes and automatically generates or updates AWS architecture diagrams using Python diagrams package. Parses CDK code to identify AWS services, relationships, and data flow, then creates visual representations with proper grouping for VPCs, subnets, and logical boundaries.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "infrastructure/**/*.ts",
+      "infrastructure/**/*.js",
+      "infrastructure/**/*.py",
+      "cdk/**/*.ts",
+      "cdk/**/*.js",
+      "cdk/**/*.py",
+      "lib/**/*.ts",
+      "lib/**/*.js",
+      "lib/**/*.py"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the modified CDK files and generate AWS architecture diagrams:\n\n1. Parse the CDK code to identify all AWS services being used (EC2, Lambda, S3, RDS, API Gateway, etc.)\n2. Map out the relationships and data flow between services\n3. Check if a previous diagram exists in the project (look for .png files or Python diagram scripts)\n4. If a previous diagram exists, delete it before creating the new one\n5. Generate Python code using the diagrams package that:\n   - Imports necessary AWS service icons from diagrams.aws.*\n   - Creates proper grouping with Cluster for VPCs, subnets, and logical boundaries\n   - Shows connections between services with arrows indicating data flow\n   - Uses clear labels and proper layout\n6. Save the Python diagrams code to a file (e.g., architecture_diagram.py) that can be executed\n7. Include instructions on how to run the diagram generation (requires: pip install diagrams)\n\nOutput the complete Python diagrams code and explain what infrastructure components are visualized."
+  }
+}
