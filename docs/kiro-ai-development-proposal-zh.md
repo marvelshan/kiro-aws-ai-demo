@@ -1,4 +1,4 @@
-# 使用 Kiro 進行 AI 驅動開發：DevOps 視角
+# 使用 Kiro 進行 AI 驅動開發
 
 ## 執行摘要
 
@@ -40,26 +40,26 @@
 
 Kiro 不只是另一個 AI 編碼助手。它是一個綜合開發環境，結合了：
 
-1. **結構化開發流程** - 規格驅動方法論確保從需求到實作的清晰度
-2. **智能自動化** - Hooks 和 agents 自動處理重複性任務
-3. **品質保證** - 內建 checkpoints 和屬性基礎測試
-4. **團隊協作** - 隨專案演進的活文件
-5. **可擴展性** - MCP server 整合提供增強功能
+1. **結構化開發流程** - Spec-driven 方法論確保從需求到實作的清晰度
+2. **智能自動化** - Hooks 和 Agents 自動處理重複性任務
+3. **品質保證** - 內建 Checkpoints 和 Property-Based Testing
+4. **團隊協作** - Living Documentation 隨專案演進持續更新
+5. **可擴展性** - MCP Server 整合提供增強功能
 
 ### 關鍵差異化特點
 
 | 功能 | 傳統 IDE + AI | Kiro AI IDE |
 |---------|---------------------|-------------|
 | 需求管理 | 手動文件 | 結構化 requirements.md 使用 EARS 模式 |
-| 設計文件 | 經常過時 | 活的 design.md 包含正確性屬性 |
+| 設計文件 | 經常過時 | Living design.md 包含 Correctness Properties |
 | 任務規劃 | 臨時或獨立工具 | 整合的 tasks.md 追蹤進度 |
-| 程式碼標準 | Linting + 人工審查 | Agent steering 自動執行 |
-| 自動化 | 自訂腳本 | 內建 hooks 系統 |
-| 測試策略 | 手動撰寫測試 | 屬性基礎測試整合 |
+| 程式碼標準 | Linting + 人工審查 | Agent Steering 自動執行 |
+| 自動化 | 自訂腳本 | 內建 Hooks 系統 |
+| 測試策略 | 手動撰寫測試 | Property-Based Testing 整合 |
 
 ---
 
-## 規格驅動開發模型
+## Spec-Driven Development 模型
 
 ### 三文件工作流程
 
@@ -95,10 +95,10 @@ Kiro 使用結構化方法，透過三個核心文件來指導整個開發過程
 - **測試策略** - 單元測試和屬性基礎測試方法
 
 **優點：**
-- 作為活文件
-- 包含用於屬性基礎測試的正確性屬性
+- 作為 Living Documentation 持續更新
+- 包含用於 Property-Based Testing 的 Correctness Properties
 - 提供清晰的技術方向
-- 促進程式碼審查和新人培訓
+- 促進 Code Review 和新人 Onboarding
 
 #### 3. **tasks.md** - 執行計畫
 
@@ -134,19 +134,19 @@ Kiro 使用結構化方法，透過三個核心文件來指導整個開發過程
 
 ## 增強團隊協作
 
-### 活文件
+### Living Documentation
 
 與傳統文件會過時不同：
 
 1. **需求可追溯**
    - 每個任務都參照特定需求
    - 需求變更會觸發設計更新
-   - 清晰的決策審計軌跡
+   - 清晰的決策 Audit Trail
 
 2. **設計保持最新**
    - 與實作同步更新
-   - 包含用於驗證的正確性屬性
-   - 作為新人培訓材料
+   - 包含用於驗證的 Correctness Properties
+   - 作為新人 Onboarding 材料
 
 3. **進度可見**
    - 即時追蹤任務完成度
@@ -159,9 +159,9 @@ Kiro 使用結構化方法，透過三個核心文件來指導整個開發過程
 - 閱讀 `requirements.md` 了解我們在建構什麼
 - 審查 `design.md` 了解如何運作
 - 檢查 `tasks.md` 查看當前進度
-- 使用 agent steering 了解編碼標準
+- 使用 Agent Steering 了解編碼標準
 
-**結果：** 新人培訓時間從數週縮短到數天。
+**結果：** Onboarding 時間從數週縮短到數天。
 
 ---
 
@@ -169,7 +169,7 @@ Kiro 使用結構化方法，透過三個核心文件來指導整個開發過程
 
 ### 什麼是 MCP？
 
-Model Context Protocol (MCP) 允許 Kiro 連接到外部工具和服務，將其功能擴展到程式碼生成之外。
+Model Context Protocol (MCP) 允許 Kiro 連接到外部工具和服務，將其功能擴展到 Code Generation 之外。
 
 ### 可用的 MCP Servers
 
@@ -241,7 +241,7 @@ Model Context Protocol (MCP) 允許 Kiro 連接到外部工具和服務，將其
 
 ### 什麼是 Hooks？
 
-Hooks 是事件驅動的自動化，根據開發工作流程中的特定事件觸發動作。
+Hooks 是 Event-Driven 的自動化機制，根據開發工作流程中的特定事件觸發動作。
 
 ### Hook 類型
 
@@ -329,9 +329,9 @@ Hooks 是事件驅動的自動化，根據開發工作流程中的特定事件�
 ```
 
 **優點：**
-- 程式碼變更的即時回饋
-- 及早發現回歸問題
-- 強制執行測試驅動開發
+- 程式碼變更的即時 Feedback
+- 及早發現 Regression 問題
+- 強制執行 Test-Driven Development
 
 #### 更新文件
 ```json
@@ -359,7 +359,7 @@ Hooks 是事件驅動的自動化，根據開發工作流程中的特定事件�
 
 ### 什麼是 Agent Steering？
 
-Agent steering 為 AI agent 提供上下文和指示，確保整個專案的一致行為。
+Agent Steering 為 AI Agent 提供 Context 和指示，確保整個專案的一致行為。
 
 ### Steering 檔案結構
 
@@ -390,24 +390,24 @@ inclusion: always
 
 ### 包含類型
 
-#### 1. **總是包含**
+#### 1. **總是包含 (Always)**
 ```markdown
 ---
 inclusion: always
 ---
 ```
-應用於每次 agent 互動。
+應用於每次 Agent 互動。
 
-#### 2. **條件包含**
+#### 2. **條件包含 (Conditional)**
 ```markdown
 ---
 inclusion: fileMatch
 fileMatchPattern: "*.test.ts"
 ---
 ```
-僅在匹配的檔案在上下文中時應用。
+僅在匹配的檔案在 Context 中時應用。
 
-#### 3. **手動包含**
+#### 3. **手動包含 (Manual)**
 ```markdown
 ---
 inclusion: manual
@@ -442,7 +442,7 @@ fileMatchPattern: "infrastructure/**/*.ts"
 - 負責團隊
 ```
 
-**結果：** 每個 CDK 檔案自動遵循這些標準，無需人工審查。
+**結果：** 每個 CDK 檔案自動遵循這些標準，無需人工 Code Review。
 
 ---
 
@@ -458,7 +458,7 @@ Checkpoints 是任務列表中的品質關卡，確保在進入下一階段前�
 - [ ] 3. 實作使用者認證
   - [ ] 3.1 建立使用者模型
   - [ ] 3.2 實作 JWT tokens
-  - [ ]* 3.3 撰寫屬性測試
+  - [ ]* 3.3 撰寫 Property Tests
 
 - [ ] 4. Checkpoint - 確保所有測試通過
   - 確保所有測試通過，如有問題請詢問使用者
@@ -470,20 +470,20 @@ Checkpoints 是任務列表中的品質關卡，確保在進入下一階段前�
 
 ### 優點
 
-1. **品質保證**
+1. **品質保證 (Quality Assurance)**
    - 在邏輯斷點強制執行測試
    - 在問題複雜化前發現
-   - 確保每個里程碑都有可運作的軟體
+   - 確保每個 Milestone 都有可運作的軟體
 
-2. **風險緩解**
+2. **風險緩解 (Risk Mitigation)**
    - 防止在破損的基礎上建構
    - 允許及早修正方向
-   - 減少除錯時間
+   - 減少 Debug 時間
 
 3. **團隊信心**
    - 清晰的進度指標
    - 驗證的工作狀態
-   - 程式碼審查的安全點
+   - Code Review 的安全點
 
 ### Checkpoint 最佳實踐
 
@@ -499,25 +499,25 @@ Checkpoints 是任務列表中的品質關卡，確保在進入下一階段前�
 ### 關鍵要點
 
 1. **結構化方法**
-   - 規格驅動開發消除模糊性
+   - Spec-Driven Development 消除模糊性
    - 三文件工作流程確保清晰度
-   - 具有批准關卡的迭代流程
+   - 具有 Approval Gates 的迭代流程
 
 2. **增強功能**
-   - MCP servers 提供即時資訊
+   - MCP Servers 提供即時資訊
    - Hooks 自動化重複性任務
-   - Agent steering 確保一致性
+   - Agent Steering 確保一致性
 
 3. **品質保證**
    - Checkpoints 強制執行品質關卡
-   - 屬性基礎測試捕捉邊緣案例
-   - 活文件保持最新
+   - Property-Based Testing 捕捉 Edge Cases
+   - Living Documentation 保持最新
 
 4. **團隊優勢**
-   - 更快的新人培訓
+   - 更快的 Onboarding
    - 更好的協作
    - 一致的程式碼品質
-   - 減少技術債務
+   - 減少 Technical Debt
 
 ## 附錄
 
