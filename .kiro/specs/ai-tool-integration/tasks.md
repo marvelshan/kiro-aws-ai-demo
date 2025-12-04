@@ -1,14 +1,14 @@
 # Implementation Plan
 
-- [ ] 1. Set up project structure and dependencies
+- [x] 1. Set up project structure and dependencies
   - Create directory structure for frontend, build scripts, and infrastructure
   - Initialize package.json with required dependencies (marked.js, highlight.js, fast-check, jest/vitest)
   - Set up TypeScript configuration for build scripts
   - Create .gitignore for node_modules and build artifacts
   - _Requirements: All_
 
-- [ ] 2. Implement article scanner and list generator
-  - [ ] 2.1 Create file scanner module
+- [x] 2. Implement article scanner and list generator
+  - [x] 2.1 Create file scanner module
     - Write function to recursively scan directory for .md files
     - Filter out hidden files and non-markdown files
     - Return array of file paths
@@ -18,7 +18,7 @@
     - **Property 6: File scanner finds all markdown files**
     - **Validates: Requirements 4.1, 4.2, 4.5**
   
-  - [ ] 2.3 Create frontmatter parser
+  - [x] 2.3 Create frontmatter parser
     - Parse YAML frontmatter from markdown files
     - Extract title, date, description, and tags
     - Handle files without frontmatter using fallback logic
@@ -32,7 +32,7 @@
     - **Property 8: Fallback metadata generation**
     - **Validates: Requirements 4.4**
   
-  - [ ] 2.6 Create article list generator
+  - [x] 2.6 Create article list generator
     - Combine scanner and parser to generate list.json
     - Sort articles by date (newest first)
     - Write output to dist/articles/list.json
