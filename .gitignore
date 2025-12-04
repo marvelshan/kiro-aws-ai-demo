@@ -38,7 +38,10 @@ coverage/
 # CDK
 cdk.out/
 *.d.ts
-*.js
+# Only ignore compiled JS in infrastructure, not source files
+infrastructure/**/*.js
+!infrastructure/bin/*.js
+!infrastructure/lib/*.js
 
 # Temporary files
 *.tmp
