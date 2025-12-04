@@ -143,27 +143,27 @@
     - Test parse error handling
     - _Requirements: 7.1-7.5_
 
-- [ ] 7. Set up AWS infrastructure with CDK
-  - [ ] 7.1 Initialize CDK project
+- [x] 7. Set up AWS infrastructure with CDK
+  - [x] 7.1 Initialize CDK project
     - Create CDK app structure
     - Define stack for blog infrastructure
     - _Requirements: All (infrastructure)_
   
-  - [ ] 7.2 Create S3 bucket
+  - [x] 7.2 Create S3 bucket
     - Configure static website hosting
     - Set up bucket policy for CloudFront access
     - Enable versioning
     - Configure CORS if needed
     - _Requirements: All (infrastructure)_
   
-  - [ ] 7.3 Create CloudFront distribution
+  - [x] 7.3 Create CloudFront distribution
     - Configure S3 as origin
     - Set up Origin Access Identity
     - Configure caching behavior
     - Enable HTTPS
     - _Requirements: All (infrastructure)_
   
-  - [ ] 7.4 Add deployment script
+  - [x] 7.4 Add deployment script
     - Create script to build and sync to S3
     - Add CloudFront cache invalidation
     - _Requirements: All (infrastructure)_
