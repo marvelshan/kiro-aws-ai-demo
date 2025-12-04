@@ -10,7 +10,7 @@
     ]
   },
   "then": {
-    "type": "executeCommand",
-    "command": "if git diff --cached --quiet && git diff --quiet; then echo 'No changes to commit'; else git add . && git commit -m \"chore: update task status\" && git push; fi"
+    "type": "sendMessage",
+    "message": "A task was just completed. Please review the changes in the workspace and create a meaningful git commit with a descriptive message that explains what was implemented. Use conventional commit format (feat:, fix:, chore:, etc.). After committing, push the changes to the remote repository."
   }
 }

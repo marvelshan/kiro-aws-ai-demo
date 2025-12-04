@@ -283,6 +283,15 @@ body {
 .error-text {
     color: var(--text-light);
     margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+.error-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .retry-button {
@@ -293,12 +302,16 @@ body {
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
-    margin-bottom: var(--spacing-md);
     transition: background-color 0.2s ease;
+    font-weight: 500;
 }
 
 .retry-button:hover {
     background-color: #2980b9;
+}
+
+.retry-button:active {
+    transform: translateY(1px);
 }
 
 /* Empty state */
