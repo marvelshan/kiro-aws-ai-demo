@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Auto Commit on Task Complete",
+  "description": "Automatically commits and pushes changes to Git when a task is marked as completed in the tasks.md file",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      ".kiro/specs/**/tasks.md"
+    ]
+  },
+  "then": {
+    "type": "executeCommand",
+    "command": "if git diff --cached --quiet && git diff --quiet; then echo 'No changes to commit'; else git add . && git commit -m \"chore: update task status\" && git push; fi"
+  }
+}

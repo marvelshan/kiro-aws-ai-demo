@@ -91,14 +91,14 @@
     - Test click navigation
     - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 5. Implement article detail view
-  - [ ] 5.1 Create markdown loader
+- [x] 5. Implement article detail view
+  - [x] 5.1 Create markdown loader
     - Fetch markdown file from S3
     - Handle 404 errors
     - Handle network errors
     - _Requirements: 2.1, 2.2_
   
-  - [ ] 5.2 Integrate markdown parser
+  - [x] 5.2 Integrate markdown parser
     - Configure marked.js or markdown-it
     - Set up highlight.js for code syntax highlighting
     - Parse markdown to HTML
@@ -108,7 +108,7 @@
     - **Property 4: Markdown to HTML conversion preserves structure**
     - **Validates: Requirements 2.2, 2.3, 3.1, 3.2, 3.3, 3.4**
   
-  - [ ] 5.4 Create article detail component
+  - [x] 5.4 Create article detail component
     - Render article title and date
     - Render converted HTML content
     - Add back navigation link
