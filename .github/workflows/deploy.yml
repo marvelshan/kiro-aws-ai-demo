@@ -36,21 +36,24 @@ jobs:
       - name: Build
         run: npm run build
       
-      - name: Configure AWS credentials
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+      # AWS 部署步驟（需要先設定 GitHub Secrets）
+      # 取消註解以下步驟來啟用自動部署
       
-      - name: Deploy to S3
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ --delete
+      # - name: Configure AWS credentials
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+      #     aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
       
-      - name: Invalidate CloudFront cache
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+      # - name: Deploy to S3
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: |
+      #     aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ --delete
+      
+      # - name: Invalidate CloudFront cache
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: |
+      #     aws cloudfront create-invalidation \
+      #       --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+      #       --paths "/*"
