@@ -2,6 +2,12 @@
 
 一個簡單的 serverless 靜態部落格系統，用於展示儲存在 Git repository 中的 Markdown 文章。使用 AWS S3、CloudFront 和原生 JavaScript 建構。
 
+## 🌐 線上展示
+
+**網站網址**: https://d2cao5u79lg5yr.cloudfront.net
+
+透過 CloudFront CDN 全球加速，提供快速的訪問體驗。
+
 ## 功能特色
 
 - 使用 Markdown 和 YAML frontmatter 撰寫文章
