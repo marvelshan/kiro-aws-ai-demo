@@ -168,14 +168,14 @@
     - Add CloudFront cache invalidation
     - _Requirements: All (infrastructure)_
 
-- [ ] 8. Create build and deployment pipeline
-  - [ ] 8.1 Create build script
+- [x] 8. Create build and deployment pipeline
+  - [x] 8.1 Create build script
     - Run article scanner and generator
     - Bundle frontend assets
     - Copy all files to dist/
     - _Requirements: 4.1-4.5_
   
-  - [ ] 8.2 Set up CI/CD configuration
+  - [x] 8.2 Set up CI/CD configuration
     - Create GitHub Actions workflow or similar
     - Add steps: install, test, build, deploy
     - Configure AWS credentials

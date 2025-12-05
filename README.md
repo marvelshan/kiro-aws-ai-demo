@@ -226,7 +226,81 @@ tags: ["tag1", "tag2"]        # Optional
 
 ## Deployment
 
-### Infrastructure Updates
+### Automated CI/CD (GitHub Actions)
+
+The project includes a GitHub Actions workflow that automatically builds and deploys on every push to the main branch.
+
+#### Setup GitHub Actions
+
+1. **Configure AWS Credentials**
+
+   The workflow uses OIDC for secure AWS authentication. Set up the following in your AWS account:
+
+   ```bash
+   # Create an OIDC provider for GitHub Actions (one-time setup)
+   aws iam create-open-id-connect-provider \
+     --url https://token.actions.githubusercontent.com \
+     --client-id-list sts.amazonaws.com \
+     --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1
+   ```
+
+   Create an IAM role with the following trust policy:
+
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Principal": {
+           "Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+         },
+         "Action": "sts:AssumeRoleWithWebIdentity",
+         "Condition": {
+           "StringEquals": {
+             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+           },
+           "StringLike": {
+             "token.actions.githubusercontent.com:sub": "repo:YOUR_GITHUB_USERNAME/YOUR_REPO_NAME:*"
+           }
+         }
+       }
+     ]
+   }
+   ```
+
+   Attach policies for S3 and CloudFront access to the role.
+
+2. **Configure GitHub Secrets**
+
+   Add the following secrets to your GitHub repository (Settings → Secrets and variables → Actions):
+
+   - `AWS_ROLE_ARN`: ARN of the IAM role created above (e.g., `arn:aws:iam::123456789012:role/GitHubActionsRole`)
+   - `AWS_REGION`: AWS region (e.g., `us-east-1`)
+   - `S3_BUCKET_NAME`: Your S3 bucket name
+   - `CLOUDFRONT_DISTRIBUTION_ID`: Your CloudFront distribution ID
+
+3. **Workflow Triggers**
+
+   The workflow runs on:
+   - Push to `main` branch (builds, tests, and deploys)
+   - Pull requests (builds and tests only)
+   - Manual trigger via GitHub Actions UI
+
+#### Workflow Steps
+
+1. **Checkout code** - Fetches the repository
+2. **Setup Node.js** - Installs Node.js 20 with npm caching
+3. **Install dependencies** - Runs `npm ci` for clean install
+4. **Run tests** - Executes all tests
+5. **Build** - Generates article list and bundles frontend
+6. **Configure AWS credentials** - Authenticates with AWS using OIDC
+7. **Deploy to S3** - Syncs build output to S3 bucket
+8. **Invalidate CloudFront cache** - Clears CDN cache for immediate updates
+
+### Manual Deployment
+
+#### Infrastructure Updates
 
 View changes before deploying:
 
@@ -240,7 +314,7 @@ Deploy infrastructure changes:
 npm run cdk:deploy
 ```
 
-### Content Updates
+#### Content Updates
 
 After adding or modifying articles:
 
@@ -248,7 +322,7 @@ After adding or modifying articles:
 npm run deploy
 ```
 
-### Manual S3 Sync
+#### Manual S3 Sync
 
 If needed, sync files manually:
 
@@ -256,7 +330,7 @@ If needed, sync files manually:
 aws s3 sync dist/ s3://YOUR-BUCKET-NAME/ --delete
 ```
 
-### Cache Invalidation
+#### Cache Invalidation
 
 Manually invalidate CloudFront cache:
 
