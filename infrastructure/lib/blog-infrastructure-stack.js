@@ -95,11 +95,9 @@ export class BlogInfrastructureStack extends cdk.Stack {
         },
       ],
       
-      // Enable logging
-      enableLogging: true,
-      logBucket: websiteBucket,
-      logFilePrefix: 'cloudfront-logs/',
-      logIncludesCookies: false,
+      // Disable logging to avoid ACL issues
+      // Can be enabled later with a separate logging bucket if needed
+      enableLogging: false,
     });
 
     // Grant CloudFront read access to S3 bucket

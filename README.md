@@ -27,7 +27,11 @@ Git Repository → Build Script → S3 Bucket → CloudFront → 讀者
 
 ### 架構圖
 
-產生基礎設施的視覺化圖表：
+![部落格架構圖](generated-diagrams/blog-architecture-updated.png)
+
+架構圖會透過 Kiro Agent Hook 自動生成和更新。
+
+**手動產生架構圖：**
 
 ```bash
 # 安裝 Graphviz（必要）
@@ -41,7 +45,7 @@ pip install diagrams
 python3 infrastructure/generate_architecture_diagram.py
 ```
 
-圖表會儲存為 `infrastructure/blog-architecture.png`。
+圖表會儲存為 `generated-diagrams/blog-architecture-updated.png`。
 
 ## 快速開始
 
