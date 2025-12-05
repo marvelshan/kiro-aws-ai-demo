@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Import Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #24292e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #1a1e22;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Importer Test</h1>
+    
+    <div>
+        <label for="repo-url">GitHub Repository URL:</label><br>
+        <input type="text" id="repo-url" value="https://github.com/marvelshan/tech-forum" style="width: 100%; padding: 10px; margin: 10px 0;">
+    </div>
+    
+    <button onclick="testImport()">Test Import</button>
+    
+    <div id="result"></div>
+    
+    <script type="module">
+        import GitHubImporter from './dist/github-importer.js';
+        
+        window.testImport = async function() {
+            const url = document.getElementById('repo-url').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.textContent = 'Loading...';
+            
+            try {
+                const importer = new GitHubImporter();
+                const articles = await importer.importRepository(url);
+                
+                resultDiv.textContent = `Success! Found ${articles.length} articles:\n\n` +
+                    articles.map((a, i) => `${i + 1}. ${a.title} (${a.date})`).join('\n');
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        };
+    </script>
+</body>
+</html>

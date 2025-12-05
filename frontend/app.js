@@ -396,6 +396,87 @@ function renderArticleDetail(article, htmlContent) {
             hljs.highlightElement(block);
         });
     }
+    
+    // Add copy buttons to code blocks
+    addCopyButtonsToCodeBlocks();
+}
+
+/**
+ * Add copy buttons to all code blocks
+ */
+function addCopyButtonsToCodeBlocks() {
+    const codeBlocks = document.querySelectorAll('.article-content pre');
+    
+    codeBlocks.forEach((pre) => {
+        // Skip if button already exists
+        if (pre.querySelector('.copy-button')) {
+            return;
+        }
+        
+        // Create copy button
+        const button = document.createElement('button');
+        button.className = 'copy-button';
+        button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 2.5h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M3.5 5.5h-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>
+            <span class="copy-text">複製</span>
+        `;
+        button.setAttribute('aria-label', '複製程式碼');
+        
+        // Add click handler
+        button.addEventListener('click', async () => {
+            const code = pre.querySelector('code');
+            const text = code.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                // Show success feedback
+                button.classList.add('copied');
+                const textSpan = button.querySelector('.copy-text');
+                textSpan.textContent = '已複製！';
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    textSpan.textContent = '複製';
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    button.classList.add('copied');
+                    const textSpan = button.querySelector('.copy-text');
+                    textSpan.textContent = '已複製！';
+                    
+                    setTimeout(() => {
+                        button.classList.remove('copied');
+                        textSpan.textContent = '複製';
+                    }, 2000);
+                } catch (err2) {
+                    console.error('Fallback copy failed:', err2);
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        });
+        
+        // Add button to pre element
+        pre.style.position = 'relative';
+        pre.appendChild(button);
+    });
 }
 
 /**

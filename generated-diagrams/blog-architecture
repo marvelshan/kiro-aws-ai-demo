@@ -1,0 +1,24 @@
+digraph "Blog Infrastructure Architecture" {
+	graph [fontcolor="#2D3436" fontname="Sans-Serif" fontsize=15 label="Blog Infrastructure Architecture" nodesep=0.60 pad=2.0 rankdir=LR ranksep=0.75 splines=ortho]
+	node [fixedsize=true fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13 height=1.4 imagescale=true labelloc=b shape=box style=rounded width=1.4]
+	edge [color="#7B8894"]
+	c6bf65f6db024fcdb84b1ea2d8c20f81 [label="Blog Visitors" height=1.9 image="/Users/zakilu/.cache/uv/archive-v0/DV21BzRN3UAaR-D8SKUn2/lib/python3.10/site-packages/resources/aws/general/user.png" shape=none]
+	ec3ba5c6d5154b109e2bc16f87bc7060 [label="CloudFront
+Distribution
+(HTTPS, HTTP/2+3)" height=2.7 image="/Users/zakilu/.cache/uv/archive-v0/DV21BzRN3UAaR-D8SKUn2/lib/python3.10/site-packages/resources/aws/network/cloudfront.png" shape=none]
+	subgraph "cluster_S3 Storage" {
+		graph [bgcolor="#E5F5FD" fontname="Sans-Serif" fontsize=12 label="S3 Storage" labeljust=l pencolor="#AEB6BE" rankdir=LR shape=box style=rounded]
+		"2f9a1800751842d29bdb1a6edaa85707" [label="Website Bucket
+(Versioned, Encrypted)" height=2.3 image="/Users/zakilu/.cache/uv/archive-v0/DV21BzRN3UAaR-D8SKUn2/lib/python3.10/site-packages/resources/aws/storage/simple-storage-service-s3.png" shape=none]
+		ef99a49abbd340f39b103239e52e8194 [label="Access Logs
+& CloudFront Logs" height=2.3 image="/Users/zakilu/.cache/uv/archive-v0/DV21BzRN3UAaR-D8SKUn2/lib/python3.10/site-packages/resources/aws/storage/simple-storage-service-s3.png" shape=none]
+	}
+	c6bf65f6db024fcdb84b1ea2d8c20f81 -> ec3ba5c6d5154b109e2bc16f87bc7060 [label="HTTPS Requests" dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	ec3ba5c6d5154b109e2bc16f87bc7060 -> "2f9a1800751842d29bdb1a6edaa85707" [label="Origin Access Control" dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	ec3ba5c6d5154b109e2bc16f87bc7060 -> ef99a49abbd340f39b103239e52e8194 [label="Access Logs" dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	"2f9a1800751842d29bdb1a6edaa85707" -> ef99a49abbd340f39b103239e52e8194 [label="Server Logs" dir=forward fontcolor="#2D3436" fontname="Sans-Serif" fontsize=13]
+	fbb11599aea64de4a7c2f27d854c6893 [label="Static Content:
+- HTML/CSS/JS
+- Markdown Articles
+- Article Metadata" height=3.1 image="/Users/zakilu/.cache/uv/archive-v0/DV21BzRN3UAaR-D8SKUn2/lib/python3.10/site-packages/resources/aws/general/general.png" shape=none]
+}
