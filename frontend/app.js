@@ -14,12 +14,8 @@ const router = new Router();
 const articleSearch = new ArticleSearch();
 const githubImporter = new GitHubImporter();
 
-// Store current articles (from local or GitHub)
+// Store current articles
 let currentArticles = [];
-let isGitHubMode = false;
-
-// Default GitHub repository
-const DEFAULT_GITHUB_REPO = 'marvelshan/tech-forum';
 
 /**
  * Error logger utility
@@ -99,49 +95,25 @@ async function handleArticleList(params) {
     content.innerHTML = '<div class="loading">載入文章列表中...</div>';
     
     console.log('handleArticleList called');
-    console.log('isGitHubMode:', isGitHubMode);
-    console.log('currentArticles.length:', currentArticles.length);
     
     try {
-        // Use GitHub articles if in GitHub mode, otherwise try to load from GitHub first
-        if (isGitHubMode && currentArticles.length > 0) {
-            console.log('Using GitHub articles:', currentArticles.length);
-            articleSearch.initialize(currentArticles);
-            renderArticleList(currentArticles);
-        } else {
-            // Try to load from default GitHub repository first
-            console.log('Attempting to load from default GitHub repository');
-            try {
-                const articles = await githubImporter.importRepository(DEFAULT_GITHUB_REPO);
-                currentArticles = articles;
-                isGitHubMode = true;
-                
-                console.log(`Loaded ${articles.length} articles from GitHub`);
-                articleSearch.initialize(articles);
-                renderArticleList(articles);
-            } catch (githubError) {
-                console.warn('GitHub fetch failed, falling back to local articles:', githubError.message);
-                
-                // Fallback to local articles
-                console.log('Fetching local articles');
-                const response = await fetch('articles/list.json');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const articles = data.articles || [];
-                currentArticles = articles;
-                isGitHubMode = false;
-                
-                // Initialize search with articles
-                articleSearch.initialize(articles);
-                
-                // Render article list
-                renderArticleList(articles);
-            }
+        // Fetch article list from local files (now from Git submodule)
+        console.log('Fetching articles from Git submodule');
+        const response = await fetch('articles/list.json');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        const articles = data.articles || [];
+        currentArticles = articles;
+        
+        // Initialize search with articles
+        articleSearch.initialize(articles);
+        
+        // Render article list
+        renderArticleList(articles);
         
     } catch (error) {
         ErrorLogger.logNetworkError('articles/list.json', error);
@@ -163,17 +135,12 @@ function renderArticleList(articles) {
         const emptyTemplate = document.getElementById('empty-state-template');
         const clone = emptyTemplate.content.cloneNode(true);
         
-        // Update empty state message based on mode
+        // Update empty state message
         const emptyTitle = clone.querySelector('h2');
         const emptyText = clone.querySelector('p');
         
-        if (isGitHubMode) {
-            emptyTitle.textContent = '目前還沒有文章';
-            emptyText.textContent = '從 GitHub repository 未找到任何 markdown 文章';
-        } else {
-            emptyTitle.textContent = '目前還沒有文章';
-            emptyText.textContent = '敬請期待更多精彩內容';
-        }
+        emptyTitle.textContent = '目前還沒有文章';
+        emptyText.textContent = '敬請期待更多精彩內容';
         
         content.innerHTML = '';
         content.appendChild(clone);
@@ -186,13 +153,9 @@ function renderArticleList(articles) {
     const listTemplate = document.getElementById('article-list-template');
     const listClone = listTemplate.content.cloneNode(true);
     
-    // Update page title based on mode
+    // Update page title
     const pageTitle = listClone.querySelector('.page-title');
-    if (isGitHubMode) {
-        pageTitle.textContent = `所有文章 (來自 GitHub)`;
-    } else {
-        pageTitle.textContent = '所有文章';
-    }
+    pageTitle.textContent = '所有文章 (來自 Git Submodule)';
     
     const articlesContainer = listClone.getElementById('articles-container');
     
@@ -281,58 +244,37 @@ async function handleArticleDetail(params) {
     content.innerHTML = `<div class="loading">載入文章中...</div>`;
     
     console.log('handleArticleDetail called for:', params.id);
-    console.log('isGitHubMode:', isGitHubMode);
     
     try {
-        let article;
-        let markdownContent;
-        
-        // Check if we're in GitHub mode and have the article in memory
-        if (isGitHubMode && currentArticles.length > 0) {
-            console.log('Looking for article in GitHub articles');
-            article = currentArticles.find(a => a.id === params.id);
-            
-            if (!article) {
-                ErrorLogger.logNotFound('Article', params.id);
-                renderArticleNotFound(params.id);
-                return;
-            }
-            
-            // GitHub articles already have content
-            markdownContent = article.content;
-            console.log('Found GitHub article:', article.title);
-        } else {
-            console.log('Loading article from local files');
-            // Load article metadata from list.json to get filename
-            const listResponse = await fetch('articles/list.json');
-            if (!listResponse.ok) {
-                throw new Error('Failed to load article list');
-            }
-            
-            const listData = await listResponse.json();
-            article = listData.articles.find(a => a.id === params.id);
-            
-            if (!article) {
-                // Article not found in list
-                ErrorLogger.logNotFound('Article', params.id);
-                renderArticleNotFound(params.id);
-                return;
-            }
-            
-            // Fetch markdown file from S3/dist
-            const markdownResponse = await fetch(`articles/${article.filename}`);
-            
-            if (!markdownResponse.ok) {
-                if (markdownResponse.status === 404) {
-                    ErrorLogger.logNotFound('Article File', article.filename);
-                    renderArticleNotFound(params.id);
-                    return;
-                }
-                throw new Error(`HTTP error! status: ${markdownResponse.status}`);
-            }
-            
-            markdownContent = await markdownResponse.text();
+        // Load article metadata from list.json to get filename
+        const listResponse = await fetch('articles/list.json');
+        if (!listResponse.ok) {
+            throw new Error('Failed to load article list');
         }
+        
+        const listData = await listResponse.json();
+        const article = listData.articles.find(a => a.id === params.id);
+        
+        if (!article) {
+            // Article not found in list
+            ErrorLogger.logNotFound('Article', params.id);
+            renderArticleNotFound(params.id);
+            return;
+        }
+        
+        // Fetch markdown file from local files (Git submodule)
+        const markdownResponse = await fetch(`articles/${article.filename}`);
+        
+        if (!markdownResponse.ok) {
+            if (markdownResponse.status === 404) {
+                ErrorLogger.logNotFound('Article File', article.filename);
+                renderArticleNotFound(params.id);
+                return;
+            }
+            throw new Error(`HTTP error! status: ${markdownResponse.status}`);
+        }
+        
+        const markdownContent = await markdownResponse.text();
         
         // Parse markdown to HTML
         const htmlContent = parseMarkdown(markdownContent);
@@ -676,11 +618,9 @@ function performSearch(query) {
     const pageTitle = content.querySelector('.page-title');
     if (pageTitle) {
         if (query) {
-            const source = isGitHubMode ? ' (來自 GitHub)' : '';
-            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章)${source}`;
+            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章) (來自 Git Submodule)`;
         } else {
-            const source = isGitHubMode ? ' (來自 GitHub)' : '';
-            pageTitle.textContent = `所有文章${source}`;
+            pageTitle.textContent = '所有文章 (來自 Git Submodule)';
         }
     }
 }

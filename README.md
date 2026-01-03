@@ -1,12 +1,34 @@
 # 靜態部落格系統
 
-一個簡單的靜態部落格系統，用於展示儲存在 Git repository 中的 Markdown 文章。使用 GitHub Pages 和原生 JavaScript 建構。
+一個簡單的靜態部落格系統，使用 Git Submodule 從外部 repository 載入 Markdown 文章。使用 GitHub Pages 和原生 JavaScript 建構，提供快速、穩定的部落格體驗。
 
 ## 🌐 線上展示
 
 **網站網址**: 將透過 GitHub Pages 提供服務
 
 透過 GitHub Pages 的內建 CDN 提供快速的訪問體驗。
+
+## 🚀 新架構：Git Submodule
+
+本專案現在使用 **Git Submodule** 來管理文章內容，從 `marvelshan/tech-forum` repository 載入文章。
+
+### 主要優勢
+
+- **⚡ 超快建置**：建置時間從 30-60 秒縮短到 1-5 秒
+- **📱 離線支援**：一旦 clone 後可離線建置
+- **🔄 版本控制**：完整的內容版本歷史追蹤
+- **🛡️ 穩定性**：不受網路和 API 限制影響
+- **🤝 團隊協作**：標準 Git 工作流程
+
+### 架構比較
+
+| 特性 | 舊架構 (GitHub API) | 新架構 (Git Submodule) |
+|------|-------------------|----------------------|
+| 建置時間 | 30-60 秒 | 1-5 秒 |
+| 網路依賴 | 每次建置需要 | 僅更新時需要 |
+| API 限制 | 受限於 GitHub API | 無限制 |
+| 版本控制 | 無法控制版本 | 完整版本控制 |
+| 離線支援 | 不支援 | 完全支援 |
 
 ## 功能特色
 
@@ -22,12 +44,13 @@
 ## 架構
 
 ```
-Git Repository → GitHub Actions → GitHub Pages → 讀者
+Tech-Forum Repository (Submodule) → Git Submodule → GitHub Actions → GitHub Pages → 讀者
 ```
 
+- **Git Submodule**: 從 `marvelshan/tech-forum` 載入文章內容
 - **GitHub Pages**: 託管靜態檔案（HTML、CSS、JS、文章）
-- **GitHub Actions**: 自動化建置和部署流程
-- **Build Script**: 掃描 markdown 檔案並產生文章索引
+- **GitHub Actions**: 自動化建置、submodule 更新和部署流程
+- **Build Script**: 掃描 submodule 中的 markdown 檔案並產生文章索引
 - **Frontend**: 使用原生 JavaScript 的 SPA，負責 markdown 渲染
 
 ## 快速開始
@@ -43,8 +66,15 @@ Git Repository → GitHub Actions → GitHub Pages → 讀者
 Fork 或 clone 這個 repository：
 
 ```bash
+# Clone 包含 submodule 的完整專案
+git clone --recurse-submodules https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+cd YOUR_REPO_NAME
+
+# 或者分步驟 clone
 git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 cd YOUR_REPO_NAME
+git submodule init
+git submodule update
 ```
 
 ### 2. 安裝相依套件
@@ -60,22 +90,28 @@ npm install
 3. 在「Source」下選擇「GitHub Actions」
 4. 儲存設定
 
-### 4. 新增文章
+### 4. 更新文章內容
 
-在 `articles/` 目錄中建立 markdown 檔案：
+文章內容現在透過 Git Submodule 管理。有三種更新方式：
 
-```markdown
----
-title: "我的第一篇文章"
-date: "2024-12-04"
-description: "範例部落格文章"
-tags: ["教學", "入門"]
----
+#### 自動更新（推薦）
+系統已設定每日自動更新機制，無需手動操作。
 
-# 我的第一篇文章
+#### 手動更新
+```bash
+# 更新 submodule 到最新版本
+git submodule update --remote articles
 
-在這裡撰寫你的內容...
+# 提交更新
+git add articles
+git commit -m "更新文章內容到最新版本"
+git push origin main
 ```
+
+#### 在 tech-forum repository 中新增文章
+1. 前往 `https://github.com/marvelshan/tech-forum`
+2. 新增或修改 markdown 檔案
+3. 等待自動更新機制觸發（每日 10:00）
 
 ### 5. 部署
 
@@ -83,11 +119,49 @@ tags: ["教學", "入門"]
 
 ```bash
 git add .
-git commit -m "Add new article"
+git commit -m "Update blog configuration"
 git push origin main
 ```
 
 GitHub Actions 會自動建置並部署你的部落格到 GitHub Pages！
+
+## Git Submodule 管理
+
+### 檢查 Submodule 狀態
+
+```bash
+# 檢查 submodule 狀態
+git submodule status
+
+# 檢查 submodule 的 commit 資訊
+cd articles
+git log --oneline -5
+cd ..
+```
+
+### 更新內容
+
+```bash
+# 更新到最新版本
+git submodule update --remote articles
+
+# 鎖定特定版本
+cd articles
+git checkout <commit-hash>
+cd ..
+git add articles
+git commit -m "鎖定文章內容到特定版本"
+```
+
+### 自動更新機制
+
+專案包含自動更新 workflow (`.github/workflows/update-submodule.yml`)：
+
+- **每日自動更新**：每天 UTC 02:00 (台灣時間 10:00)
+- **手動觸發**：GitHub Actions 頁面可手動執行
+- **自動部署**：內容更新後自動重新部署網站
+
+詳細說明請參閱 [Submodule 使用指南](docs/submodule-usage.md)。
 
 ## 專案結構
 
@@ -95,52 +169,54 @@ GitHub Actions 會自動建置並部署你的部落格到 GitHub Pages！
 .
 ├── .github/              # GitHub Actions workflows
 │   └── workflows/
-│       └── deploy.yml    # 自動化建置和部署到 GitHub Pages
-├── articles/              # Markdown 文章（你的部落格內容）
-│   ├── sample-article.md
-│   ├── another-post.md
-│   └── comprehensive-markdown-guide.md
-├── frontend/              # 前端應用程式（SPA）
-│   ├── index.html        # 主要 HTML 模板
-│   ├── app.js            # 應用程式邏輯和主控制器
-│   ├── router.js         # 客戶端路由（hash-based）
-│   ├── search.js         # 搜尋功能
-│   ├── github-importer.js # GitHub repository 匯入功能（將被移除）
-│   └── styles.css        # 響應式樣式
-├── scripts/              # 建置和部署腳本
-│   ├── build.js          # 主要建置協調器
-│   ├── scanner.js        # 掃描 articles/ 目錄中的 .md 檔案
-│   ├── parser.js         # 解析 markdown 的 YAML frontmatter
-│   ├── generator.js      # 產生 articles/list.json 索引
-│   └── deploy.js         # 建置靜態檔案（GitHub Actions 處理部署）
-├── tests/                # 測試檔案（單元測試和 property-based 測試）
+│       ├── deploy.yml    # 自動化建置和部署到 GitHub Pages
+│       └── update-submodule.yml # 自動更新 submodule
+├── articles/             # Git Submodule (tech-forum repository)
+│   ├── *.md             # Markdown 文章（來自 tech-forum）
+│   └── question/        # 子目錄（來自 tech-forum）
+├── frontend/             # 前端應用程式（SPA）
+│   ├── index.html       # 主要 HTML 模板
+│   ├── app.js           # 應用程式邏輯和主控制器
+│   ├── router.js        # 客戶端路由（hash-based）
+│   ├── search.js        # 搜尋功能
+│   ├── github-importer.js # GitHub repository 資訊顯示
+│   └── styles.css       # 響應式樣式
+├── scripts/             # 建置和部署腳本
+│   ├── build.js         # 主要建置協調器（使用 submodule）
+│   ├── scanner.js       # 掃描 articles/ 目錄中的 .md 檔案
+│   ├── parser.js        # 解析 markdown 的 YAML frontmatter
+│   ├── generator.js     # 產生 articles/list.json 索引
+│   └── deploy.js        # 建置靜態檔案
+├── tests/               # 測試檔案
 │   ├── markdown-parser.test.js
 │   ├── article-detail.test.js
 │   └── error-handling.test.js
-├── docs/                 # 額外文件
-│   ├── search-and-github-import.md
-│   └── ci-cd-setup.md
-├── dist/                 # 建置輸出（自動產生，不在 git 中）
+├── docs/                # 文件
+│   ├── content-import-comparison.md # GitHub API vs Submodule 比較
+│   ├── submodule-usage.md          # Submodule 使用指南
+│   └── *.md            # 其他文件
+├── dist/               # 建置輸出（自動產生）
 │   ├── index.html
 │   ├── *.js, *.css
-│   ├── .nojekyll         # GitHub Pages 設定檔
+│   ├── .nojekyll       # GitHub Pages 設定檔
 │   └── articles/
-│       ├── list.json     # 產生的文章索引
-│       └── *.md          # 複製的 markdown 檔案
-├── .nojekyll             # 防止 GitHub Pages 使用 Jekyll 處理
-├── package.json          # Node.js 相依套件和腳本
-├── vitest.config.js      # 測試設定
-└── README.md             # 本檔案
+│       ├── list.json   # 產生的文章索引
+│       └── *.md        # 複製的 markdown 檔案
+├── .gitmodules         # Git submodule 設定
+├── .nojekyll           # 防止 GitHub Pages 使用 Jekyll 處理
+├── package.json        # Node.js 相依套件和腳本
+└── README.md           # 本檔案
 ```
 
 ### 主要目錄說明
 
-- **articles/**: 將你的 markdown 檔案放在這裡。建置腳本會自動發現它們。
-- **frontend/**: 客戶端應用程式程式碼。修改此處以變更 UI/UX。
-- **scripts/**: 建置自動化。修改此處以改變文章處理方式。
-- **.github/workflows/**: GitHub Actions 自動化部署設定。
-- **tests/**: 自動化測試。新增功能時請加入測試。
-- **dist/**: 建置時產生。請勿手動編輯 - 變更會被覆寫。
+- **articles/**: Git Submodule，包含來自 `marvelshan/tech-forum` 的文章內容
+- **frontend/**: 客戶端應用程式程式碼。修改此處以變更 UI/UX
+- **scripts/**: 建置自動化。現在使用本地 submodule 而非 GitHub API
+- **.github/workflows/**: GitHub Actions 自動化部署和 submodule 更新
+- **docs/**: 包含架構比較和使用指南
+- **tests/**: 自動化測試
+- **dist/**: 建置時產生。請勿手動編輯
 
 ## 開發
 
