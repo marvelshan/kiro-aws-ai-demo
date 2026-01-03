@@ -34,14 +34,6 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
-# CDK
-cdk.out/
-*.d.ts
-# Only ignore compiled JS in infrastructure, not source files
-infrastructure/**/*.js
-!infrastructure/bin/*.js
-!infrastructure/lib/*.js
-
 # Temporary files
 *.tmp
 *.temp

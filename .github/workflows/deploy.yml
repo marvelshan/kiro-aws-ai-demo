@@ -1,10 +1,7 @@
-name: Build and Deploy
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -14,8 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      id-token: write
       contents: read
+      pages: write
+      id-token: write
+    
+    # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+    # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
@@ -33,27 +41,17 @@ jobs:
       - name: Run tests
         run: npm test
       
-      - name: Build
+      - name: Build static files
         run: npm run build
       
-      # AWS 部署步驟（需要先設定 GitHub Secrets）
-      # 取消註解以下步驟來啟用自動部署
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       
-      - name: Configure AWS credentials
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+          path: './dist'
       
-      - name: Deploy to S3
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          aws s3 sync dist/ "s3://${{ secrets.S3_BUCKET_NAME }}" --delete
-      
-      - name: Invalidate CloudFront cache
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
-            --paths "/*"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

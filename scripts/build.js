@@ -45,7 +45,14 @@ async function copyFrontendFiles() {
     })
   );
   
+  // Copy .nojekyll file for GitHub Pages
+  const rootDir = join(__dirname, '..');
+  const nojekyllSource = join(rootDir, '.nojekyll');
+  const nojekyllDest = join(OUTPUT_DIR, '.nojekyll');
+  await copyFile(nojekyllSource, nojekyllDest);
+  
   console.log(`✓ Copied ${files.length} frontend files to ${OUTPUT_DIR}`);
+  console.log('✓ Copied .nojekyll file for GitHub Pages');
 }
 
 build();
