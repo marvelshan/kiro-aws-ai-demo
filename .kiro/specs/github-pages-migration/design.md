@@ -2,27 +2,29 @@
 
 ## Overview
 
-將現有的 AWS S3 + CloudFront 靜態部落格系統轉換為使用 GitHub Pages 託管的個人部落格網站。這個轉換將簡化基礎設施，降低維護成本，並提供更直接的部署流程。
+將現有的 AWS S3 + CloudFront 靜態部落格系統轉換為使用 GitHub Pages 託管的個人部落格網站，並整合從指定 GitHub Repository (`https://github.com/marvelshan/tech-forum`) 自動抓取文章內容的功能。這個轉換將簡化基礎設施，降低維護成本，並提供更直接的部署流程。
 
 ### 核心設計原則
 
 1. **簡化優先**: 移除複雜的 AWS 基礎設施，使用 GitHub Pages 的內建功能
 2. **功能保持**: 保留所有現有的核心部落格功能
 3. **自動化部署**: 透過 GitHub Actions 實現推送即部署
-4. **個人化**: 移除通用的 GitHub 匯入功能，專注於個人部落格
+4. **內容整合**: 從指定 GitHub Repository 自動抓取和同步文章內容
+5. **快取最佳化**: 在建置時抓取並快取 GitHub 內容以提升效能
 
 ## Architecture
 
 ### 新架構概覽
 
 ```
-Git Repository → GitHub Actions → GitHub Pages → 讀者
+GitHub Repository (tech-forum) → GitHub API → Build Process → GitHub Actions → GitHub Pages → 讀者
 ```
 
 **主要變更：**
 - **移除**: AWS S3, CloudFront, CDK 基礎設施
-- **新增**: GitHub Actions workflow, GitHub Pages 設定
+- **新增**: GitHub Actions workflow, GitHub Pages 設定, GitHub API 整合
 - **保持**: 前端 SPA, 建置腳本, 文章管理
+- **整合**: 從 `marvelshan/tech-forum` 自動抓取文章內容
 
 ### 架構比較
 
@@ -32,6 +34,7 @@ Git Repository → GitHub Actions → GitHub Pages → 讀者
 | 部署 | AWS CLI + CDK | GitHub Actions |
 | CDN | CloudFront | GitHub Pages CDN |
 | HTTPS | CloudFront | GitHub Pages 內建 |
+| 內容來源 | 本地 articles/ 目錄 | GitHub API (tech-forum repo) |
 | 成本 | AWS 費用 | 免費 |
 
 ## Components and Interfaces
@@ -56,21 +59,38 @@ Git Repository → GitHub Actions → GitHub Pages → 讀者
 5. 建置靜態檔案
 6. 部署到 GitHub Pages
 
-### 3. 建置系統更新
+### 3. GitHub 內容抓取系統
 
-**目的**: 調整現有建置腳本以適應 GitHub Pages
+**目的**: 從指定 GitHub Repository 自動抓取文章內容
+**實作方式**:
+- 使用 GitHub API 遞迴掃描 `https://github.com/marvelshan/tech-forum`
+- 抓取所有 `.md` 檔案及其內容
+- 解析 YAML frontmatter 和 markdown 內容
+- 在建置時快取內容到 `dist/articles/` 目錄
+- 產生統一的文章索引 JSON
+
+**API 整合**:
+- 使用 GitHub REST API v4
+- 支援 rate limiting 和錯誤處理
+- 快取機制以減少 API 呼叫
+
+### 4. 建置系統更新
+
+**目的**: 調整現有建置腳本以適應 GitHub Pages 和遠端內容抓取
 **主要變更**:
+- 整合 GitHub 內容抓取到建置流程
 - 確保輸出目錄結構符合 GitHub Pages 要求
 - 移除 AWS 相關的部署邏輯
 - 保持文章掃描和索引產生功能
 
-### 4. 前端應用程式清理
+### 5. 前端應用程式更新
 
-**目的**: 移除不需要的功能，專注於個人部落格
+**目的**: 更新前端以支援 GitHub 內容顯示
 **主要變更**:
-- 移除 `github-importer.js` 和相關 UI
-- 簡化導航和介面
+- 更新 `github-importer.js` 預設指向 `marvelshan/tech-forum`
+- 簡化 UI，移除手動輸入 URL 功能
 - 保持所有核心功能（搜尋、文章瀏覽、響應式設計）
+- 添加適當的載入狀態和錯誤處理
 
 ## Data Models
 
@@ -124,9 +144,9 @@ Git Repository → GitHub Actions → GitHub Pages → 讀者
 *For any* 核心部落格功能（搜尋、markdown 渲染、語法高亮），在新系統中應該與舊系統行為一致
 **Validates: Requirements 2.2, 2.4, 2.5**
 
-### Property 5: GitHub 匯入功能移除完整性
-*For any* 前端頁面和程式碼庫掃描，不應該包含任何與 GitHub repository 匯入相關的 UI 元素、檔案或功能
-**Validates: Requirements 3.1, 3.2**
+### Property 5: GitHub 內容抓取一致性
+*For any* 建置執行，從 `https://github.com/marvelshan/tech-forum` 抓取的 markdown 檔案應該被正確解析、索引，並且內容應該與原始 GitHub repository 保持一致
+**Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
 
 ### Property 6: HTTPS 存取保證
 *For any* 部落格頁面訪問，應該透過 HTTPS 協議提供服務

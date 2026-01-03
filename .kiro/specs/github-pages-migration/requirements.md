@@ -2,7 +2,7 @@
 
 ## Introduction
 
-將現有的 AWS S3 + CloudFront 靜態部落格系統轉換為使用 GitHub Pages 託管的個人部落格網站。移除 AWS 基礎設施依賴，簡化部署流程，並保持所有現有功能。
+將現有的 AWS S3 + CloudFront 靜態部落格系統轉換為使用 GitHub Pages 託管的個人部落格網站。移除 AWS 基礎設施依賴，簡化部署流程，並整合從指定 GitHub Repository (`https://github.com/marvelshan/tech-forum`) 自動抓取文章內容的功能。
 
 ## Glossary
 
@@ -12,6 +12,7 @@
 - **Article_Index**: 包含所有文章 metadata 的 JSON 檔案
 - **Frontend_App**: 使用原生 JavaScript 的單頁應用程式
 - **Deployment_Workflow**: GitHub Actions 自動化部署流程
+- **GitHub_Content_Fetcher**: 從指定 GitHub Repository 抓取 markdown 內容的模組
 
 ## Requirements
 
@@ -39,16 +40,17 @@
 4. WHEN 文章包含程式碼區塊 THEN THE Blog_System SHALL 提供語法高亮
 5. THE Frontend_App SHALL 支援 markdown 渲染和 YAML frontmatter 解析
 
-### Requirement 3: 移除 GitHub 匯入功能
+### Requirement 3: 整合指定 GitHub Repository 內容抓取
 
-**User Story:** 作為部落格擁有者，我想要移除 GitHub repository 匯入功能，因為這是我的個人部落格，只需要顯示我自己的文章。
+**User Story:** 作為部落格擁有者，我想要自動從指定的 GitHub repository (`https://github.com/marvelshan/tech-forum`) 抓取文章內容，這樣我就能集中管理文章並自動同步到部落格。
 
 #### Acceptance Criteria
 
-1. THE Frontend_App SHALL 移除「導入 GitHub Repo」按鈕和相關 UI 元素
-2. THE Blog_System SHALL 移除 github-importer.js 檔案和相關功能
-3. WHEN 使用者訪問部落格 THEN THE Frontend_App SHALL 只顯示 articles/ 目錄中的文章
-4. THE Build_Process SHALL 只處理本地 articles/ 目錄中的 markdown 檔案
+1. WHEN 建置過程執行 THEN THE Build_Process SHALL 從 `https://github.com/marvelshan/tech-forum` 抓取所有 markdown 檔案
+2. THE Build_Process SHALL 使用 GitHub API 遞迴掃描 repository 中的所有 markdown 檔案
+3. WHEN 抓取到 markdown 檔案 THEN THE Build_Process SHALL 解析 YAML frontmatter 並產生文章索引
+4. THE Build_Process SHALL 將抓取的文章內容快取到 dist/articles/ 目錄
+5. WHEN GitHub repository 內容更新 THEN THE Blog_System SHALL 在下次建置時反映最新內容
 
 ### Requirement 4: 簡化建置和部署流程
 
