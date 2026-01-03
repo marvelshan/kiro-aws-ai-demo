@@ -18,6 +18,9 @@ const githubImporter = new GitHubImporter();
 let currentArticles = [];
 let isGitHubMode = false;
 
+// Default GitHub repository
+const DEFAULT_GITHUB_REPO = 'marvelshan/tech-forum';
+
 /**
  * Error logger utility
  * Logs errors to console with timestamp and context
@@ -100,29 +103,44 @@ async function handleArticleList(params) {
     console.log('currentArticles.length:', currentArticles.length);
     
     try {
-        // Use GitHub articles if in GitHub mode, otherwise fetch from local
+        // Use GitHub articles if in GitHub mode, otherwise try to load from GitHub first
         if (isGitHubMode && currentArticles.length > 0) {
             console.log('Using GitHub articles:', currentArticles.length);
             articleSearch.initialize(currentArticles);
             renderArticleList(currentArticles);
         } else {
-            console.log('Fetching local articles');
-            // Fetch article list from S3/dist
-            const response = await fetch('articles/list.json');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Try to load from default GitHub repository first
+            console.log('Attempting to load from default GitHub repository');
+            try {
+                const articles = await githubImporter.importRepository(DEFAULT_GITHUB_REPO);
+                currentArticles = articles;
+                isGitHubMode = true;
+                
+                console.log(`Loaded ${articles.length} articles from GitHub`);
+                articleSearch.initialize(articles);
+                renderArticleList(articles);
+            } catch (githubError) {
+                console.warn('GitHub fetch failed, falling back to local articles:', githubError.message);
+                
+                // Fallback to local articles
+                console.log('Fetching local articles');
+                const response = await fetch('articles/list.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const articles = data.articles || [];
+                currentArticles = articles;
+                isGitHubMode = false;
+                
+                // Initialize search with articles
+                articleSearch.initialize(articles);
+                
+                // Render article list
+                renderArticleList(articles);
             }
-            
-            const data = await response.json();
-            const articles = data.articles || [];
-            currentArticles = articles;
-            
-            // Initialize search with articles
-            articleSearch.initialize(articles);
-            
-            // Render article list
-            renderArticleList(articles);
         }
         
     } catch (error) {
@@ -144,6 +162,19 @@ function renderArticleList(articles) {
         console.log('No articles to display');
         const emptyTemplate = document.getElementById('empty-state-template');
         const clone = emptyTemplate.content.cloneNode(true);
+        
+        // Update empty state message based on mode
+        const emptyTitle = clone.querySelector('h2');
+        const emptyText = clone.querySelector('p');
+        
+        if (isGitHubMode) {
+            emptyTitle.textContent = '目前還沒有文章';
+            emptyText.textContent = '從 GitHub repository 未找到任何 markdown 文章';
+        } else {
+            emptyTitle.textContent = '目前還沒有文章';
+            emptyText.textContent = '敬請期待更多精彩內容';
+        }
+        
         content.innerHTML = '';
         content.appendChild(clone);
         return;
@@ -154,6 +185,14 @@ function renderArticleList(articles) {
     // Get article list template
     const listTemplate = document.getElementById('article-list-template');
     const listClone = listTemplate.content.cloneNode(true);
+    
+    // Update page title based on mode
+    const pageTitle = listClone.querySelector('.page-title');
+    if (isGitHubMode) {
+        pageTitle.textContent = `所有文章 (來自 GitHub)`;
+    } else {
+        pageTitle.textContent = '所有文章';
+    }
     
     const articlesContainer = listClone.getElementById('articles-container');
     
@@ -637,9 +676,11 @@ function performSearch(query) {
     const pageTitle = content.querySelector('.page-title');
     if (pageTitle) {
         if (query) {
-            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章)`;
+            const source = isGitHubMode ? ' (來自 GitHub)' : '';
+            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章)${source}`;
         } else {
-            pageTitle.textContent = '所有文章';
+            const source = isGitHubMode ? ' (來自 GitHub)' : '';
+            pageTitle.textContent = `所有文章${source}`;
         }
     }
 }

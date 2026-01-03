@@ -26,7 +26,7 @@
   - **Property 2: 建置輸出完整性**
   - **Validates: Requirements 1.3, 4.2**
 
-- [ ] 3. 更新建置腳本適應 GitHub Pages
+- [x] 3. 更新建置腳本適應 GitHub Pages
   - 修改 scripts/deploy.js 移除 AWS S3 同步邏輯
   - 確保建置過程產生正確的靜態檔案結構
   - 保持現有的文章掃描和索引產生功能
@@ -36,10 +36,10 @@
   - **Property 3: 文章處理一致性**
   - **Validates: Requirements 2.1, 3.3, 3.4, 4.5, 6.3**
 
-- [ ] 4. 檢查點 - 確保基礎建置和部署正常運作
+- [x] 4. 檢查點 - 確保基礎建置和部署正常運作
   - 確保所有測試通過，詢問使用者是否有問題
 
-- [ ] 5. 實作從指定 GitHub Repository 抓取文章功能
+- [x] 5. 實作從指定 GitHub Repository 抓取文章功能
   - 修改建置腳本從 `https://github.com/marvelshan/tech-forum` 抓取 markdown 檔案
   - 實作 GitHub API 整合以獲取 repository 內容
   - 更新文章掃描邏輯以處理遠端 GitHub 內容而非本地 articles/ 目錄
@@ -51,7 +51,7 @@
   - **Property 5: GitHub 內容抓取一致性**
   - **Validates: Requirements 2.1, 4.5, 6.3**
 
-- [ ] 5.2 更新前端 UI 以支援 GitHub 內容顯示
+- [x] 5.2 更新前端 UI 以支援 GitHub 內容顯示
   - 修改 frontend/github-importer.js 預設指向 `marvelshan/tech-forum`
   - 更新 UI 文字和說明以反映新的內容來源
   - 確保文章列表和詳細頁面正確顯示 GitHub 內容

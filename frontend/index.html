@@ -133,7 +133,7 @@
             </div>
             <div class="modal-body">
                 <p class="modal-description">
-                    輸入 GitHub repository URL，系統會自動讀取所有 markdown 檔案並顯示在網站上。
+                    系統會自動從 marvelshan/tech-forum repository 載入最新的文章內容。您也可以指定其他 GitHub repository。
                 </p>
                 <div class="form-group">
                     <label for="github-url-input">GitHub Repository URL</label>
@@ -142,10 +142,11 @@
                         id="github-url-input" 
                         class="github-url-input" 
                         placeholder="例如: https://github.com/marvelshan/tech-forum"
+                        value="marvelshan/tech-forum"
                         aria-label="GitHub Repository URL"
                     />
                     <small class="form-hint">
-                        支援格式: https://github.com/owner/repo 或 owner/repo
+                        預設從 marvelshan/tech-forum 載入文章內容
                     </small>
                 </div>
                 <div id="import-status" class="import-status" style="display: none;"></div>
