@@ -28,13 +28,7 @@ function formatDisplayDate(dateString) {
 
 // ===== Reading Time =====
 
-function estimateReadingTime(text) {
-    // Average Chinese reading speed ~300 chars/min, English ~200 words/min
-    const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-    const words = text.replace(/[\u4e00-\u9fff]/g, '').trim().split(/\s+/).filter(Boolean).length;
-    const minutes = Math.ceil(chineseChars / 300 + words / 200);
-    return Math.max(1, minutes);
-}
+// (removed)
 
 // ===== Folder Tree =====
 
@@ -340,7 +334,7 @@ function renderArticleList(articles, folderName, gradient) {
         dateEl.setAttribute('datetime', article.date);
 
         const readTimeEl = itemClone.querySelector('.read-time-value');
-        if (readTimeEl) readTimeEl.textContent = article.readTime || '—';
+        if (readTimeEl) readTimeEl.closest('.article-read-time')?.remove();
 
         container.appendChild(itemClone);
     }
@@ -381,16 +375,15 @@ async function handleArticleDetail(params) {
 
         const markdownContent = await mdResponse.text();
         const htmlContent = parseMarkdown(markdownContent);
-        const readTime = estimateReadingTime(markdownContent);
 
-        renderArticleDetail(article, htmlContent, readTime);
+        renderArticleDetail(article, htmlContent);
     } catch (error) {
         renderError('載入失敗', error.message || '無法載入文章，請檢查網路連線',
             () => router.handleRouteChange());
     }
 }
 
-function renderArticleDetail(article, htmlContent, readTime) {
+function renderArticleDetail(article, htmlContent) {
     const content = document.getElementById('content');
     const clone = document.getElementById('article-detail-template').content.cloneNode(true);
 
@@ -400,8 +393,8 @@ function renderArticleDetail(article, htmlContent, readTime) {
     dateEl.textContent = formatDisplayDate(article.date);
     dateEl.setAttribute('datetime', article.date);
 
-    const readTimeEl = clone.querySelector('.read-time-value');
-    if (readTimeEl) readTimeEl.textContent = readTime || '—';
+    // Remove read-time span from detail view
+    clone.querySelector('.article-read-time')?.remove();
 
     clone.querySelector('.article-content').innerHTML = htmlContent;
 

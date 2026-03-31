@@ -356,13 +356,7 @@ body {
 }
 
 .article-read-time {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    background: var(--bg-tertiary);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-    white-space: nowrap;
+    display: none;
 }
 
 @media (max-width: 768px) {
