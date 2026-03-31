@@ -1,5 +1,9 @@
 import { readFile, stat } from 'fs/promises';
 import { basename, extname, relative, dirname } from 'path';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+
+const execFileAsync = promisify(execFile);
 import matter from 'gray-matter';
 
 /**
@@ -82,11 +86,22 @@ function generateTitleFromFilename(filePath) {
 }
 
 /**
- * Gets the file modification date
+ * Gets the last git commit date for a file, falls back to mtime
  * @param {string} filePath - Path to the file
- * @returns {Promise<string>} ISO 8601 formatted date
+ * @returns {Promise<string>} ISO 8601 formatted date (YYYY-MM-DD)
  */
 async function getFileModificationDate(filePath) {
+  try {
+    const { stdout } = await execFileAsync('git', [
+      'log', '-1', '--format=%cI', '--', filePath
+    ]);
+    const dateStr = stdout.trim();
+    if (dateStr) {
+      return new Date(dateStr).toISOString().split('T')[0];
+    }
+  } catch {
+    // git not available, fall back to mtime
+  }
   const stats = await stat(filePath);
   return stats.mtime.toISOString().split('T')[0];
 }
