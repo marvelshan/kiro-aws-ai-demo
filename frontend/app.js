@@ -114,27 +114,27 @@ const FOLDER_CONFIG = {
     },
     'kuberay系列': {
         gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+        svg: `<svg viewBox="0 0 48 48" fill="none" overflow="hidden" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="24,7 37,14.5 37,29.5 24,37 11,29.5 11,14.5" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
             <polygon points="24,14 32,19 32,29 24,34 16,29 16,19" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.08)" opacity="0.7"/>
             <circle cx="24" cy="24" r="3.5" fill="white" opacity="0.9"/>
-            <line x1="24" y1="6"  x2="24" y2="14" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="38" y1="14" x2="32" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="38" y1="30" x2="32" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="24" y1="38" x2="24" y2="34" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="10" y1="30" x2="16" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="10" y1="14" x2="16" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="24" y1="7"  x2="24" y2="14" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="37" y1="14.5" x2="32" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="37" y1="29.5" x2="32" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="24" y1="37" x2="24" y2="34" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="11" y1="29.5" x2="16" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="11" y1="14.5" x2="16" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
         </svg>`
     },
     'leetcode系列': {
         gradient: 'linear-gradient(135deg, #1a3a1a 0%, #2d5a27 100%)',
-        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        svg: `<svg viewBox="0 0 48 48" fill="none" overflow="hidden" xmlns="http://www.w3.org/2000/svg">
             <rect x="8" y="10" width="14" height="3" rx="1.5" fill="white" opacity="0.9"/>
             <rect x="8" y="17" width="22" height="3" rx="1.5" fill="white" opacity="0.7"/>
             <rect x="8" y="24" width="18" height="3" rx="1.5" fill="white" opacity="0.7"/>
             <rect x="8" y="31" width="10" height="3" rx="1.5" fill="white" opacity="0.5"/>
-            <circle cx="36" cy="34" r="7" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
-            <path d="M32.5 34 L35 36.5 L39.5 30.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="36" cy="33" r="6" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+            <path d="M32.5 33 L35 35.5 L39.5 29.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>`
     },
     'observability系列': {
@@ -150,8 +150,8 @@ const FOLDER_CONFIG = {
     },
     'question': {
         gradient: 'linear-gradient(135deg, #3d2000 0%, #7a4500 100%)',
-        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="24" cy="24" r="16" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+        svg: `<svg viewBox="0 0 48 48" fill="none" overflow="hidden" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="15" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
             <path d="M18 19c0-3.3 2.7-6 6-6s6 2.7 6 6c0 3-2 4.5-4 6s-2 3-2 4" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9"/>
             <circle cx="24" cy="35" r="2" fill="white" opacity="0.9"/>
         </svg>`
