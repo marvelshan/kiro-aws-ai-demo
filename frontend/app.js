@@ -122,14 +122,14 @@ const FOLDER_CONFIG = {
         gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
         svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
-            <polygon points="24,13 32,18 32,28 24,33 16,28 16,18" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.08)" opacity="0.7"/>
-            <circle cx="24" cy="23" r="3.5" fill="white" opacity="0.9"/>
-            <line x1="24" y1="6" x2="24" y2="13" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="38" y1="14" x2="32" y2="18" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="38" y1="30" x2="32" y2="28" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="24" y1="38" x2="24" y2="33" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="10" y1="30" x2="16" y2="28" stroke="white" stroke-width="1.5" opacity="0.6"/>
-            <line x1="10" y1="14" x2="16" y2="18" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <polygon points="24,14 32,19 32,29 24,34 16,29 16,19" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.08)" opacity="0.7"/>
+            <circle cx="24" cy="24" r="3.5" fill="white" opacity="0.9"/>
+            <line x1="24" y1="6"  x2="24" y2="14" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="38" y1="14" x2="32" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="38" y1="30" x2="32" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="24" y1="38" x2="24" y2="34" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="10" y1="30" x2="16" y2="29" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="10" y1="14" x2="16" y2="19" stroke="white" stroke-width="1.5" opacity="0.6"/>
         </svg>`
     },
     'leetcode系列': {
@@ -140,7 +140,7 @@ const FOLDER_CONFIG = {
             <rect x="8" y="24" width="18" height="3" rx="1.5" fill="white" opacity="0.7"/>
             <rect x="8" y="31" width="10" height="3" rx="1.5" fill="white" opacity="0.5"/>
             <circle cx="36" cy="34" r="7" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
-            <path d="M33 34 L35.5 36.5 L39.5 31.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M32.5 34 L35 36.5 L39.5 30.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>`
     },
     'observability系列': {
