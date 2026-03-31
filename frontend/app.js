@@ -320,10 +320,17 @@ function renderArticleList(articles, folderName, gradient) {
     for (const article of articles) {
         const itemClone = document.getElementById('article-item-template').content.cloneNode(true);
 
+        const articleEl = itemClone.querySelector('.article-item');
+        articleEl.style.cursor = 'pointer';
+        articleEl.addEventListener('click', () => {
+            router.navigateToArticle(article.id);
+        });
+
         const link = itemClone.querySelector('.article-link');
         link.textContent = article.title;
         link.href = `#/article/${article.id}`;
         link.addEventListener('click', (e) => {
+            e.stopPropagation(); // 避免觸發兩次
             e.preventDefault();
             router.navigateToArticle(article.id);
         });
