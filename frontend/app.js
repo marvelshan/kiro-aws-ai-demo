@@ -292,6 +292,11 @@ function renderArticleList(articles, folderName, gradient) {
         return;
     }
 
+    // Natural sort by title so Day2 comes before Day10
+    const sorted = [...articles].sort((a, b) =>
+        a.title.localeCompare(b.title, 'zh-TW', { numeric: true, sensitivity: 'base' })
+    );
+
     const wrapper = document.createElement('div');
     wrapper.className = 'folder-article-page';
 
@@ -311,7 +316,7 @@ function renderArticleList(articles, folderName, gradient) {
     container.id = 'articles-container';
     wrapper.appendChild(container);
 
-    for (const article of articles) {
+    for (const article of sorted) {
         const itemClone = document.getElementById('article-item-template').content.cloneNode(true);
 
         const articleEl = itemClone.querySelector('.article-item');
