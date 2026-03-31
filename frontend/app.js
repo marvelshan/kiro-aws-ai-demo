@@ -204,9 +204,16 @@ function renderFolderGrid(folderMap) {
     const wrapper = document.createElement('div');
     wrapper.className = 'folder-grid-page';
 
+    // Char-by-char title animation (like js-textAnime)
     const title = document.createElement('h2');
-    title.className = 'page-title';
-    title.textContent = '筆記分類';
+    title.className = 'page-title text-anime';
+    '筆記分類'.split('').forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'text-anime-char';
+        span.style.animationDelay = `${i * 80}ms`;
+        span.textContent = ch;
+        title.appendChild(span);
+    });
     wrapper.appendChild(title);
 
     const grid = document.createElement('div');
@@ -228,7 +235,7 @@ function renderFolderGrid(folderMap) {
         card.style.animationDelay = `${i * 70}ms`;
         card.innerHTML = `
             <div class="folder-card-bg" style="background:${config.gradient}">
-                <div class="folder-card-svg">${config.svg}</div>
+                <div class="folder-card-svg js-float-svg">${config.svg}</div>
                 <div class="folder-card-overlay"></div>
             </div>
             <div class="folder-card-body">
@@ -239,6 +246,24 @@ function renderFolderGrid(folderMap) {
         card.addEventListener('click', () => {
             router.navigate(`/folder/${encodeURIComponent(folder)}`);
         });
+
+        // Parallax float on mouse move (js-floatImg style)
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = (e.clientX - cx) / rect.width;
+            const dy = (e.clientY - cy) / rect.height;
+            const svg = card.querySelector('.js-float-svg');
+            if (svg) {
+                svg.style.transform = `translate(${dx * 10}px, ${dy * 10}px) scale(1.08)`;
+            }
+        });
+        card.addEventListener('mouseleave', () => {
+            const svg = card.querySelector('.js-float-svg');
+            if (svg) svg.style.transform = '';
+        });
+
         grid.appendChild(card);
     });
 
@@ -328,6 +353,7 @@ function renderArticleList(articles, folderName, gradient) {
         const link = itemClone.querySelector('.article-link');
         link.textContent = article.title;
         link.href = `#/article/${article.id}`;
+        link.className = 'article-link link-anime';
         link.addEventListener('click', (e) => {
             e.stopPropagation(); // 避免觸發兩次
             e.preventDefault();
