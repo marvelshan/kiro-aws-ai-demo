@@ -334,7 +334,14 @@ function renderArticleList(articles, folderName, gradient) {
             <h2 class="page-title">${folderName} <span class="folder-article-count">${articles.length}</span></h2>
         </div>
     `;
-    header.querySelector('.folder-back-btn').addEventListener('click', () => router.navigateHome());
+    header.querySelector('.folder-back-btn').addEventListener('click', () => {
+        // Clear search input when going back
+        const searchInput = document.getElementById('search-input');
+        const searchClear = document.getElementById('search-clear');
+        if (searchInput) { searchInput.value = ''; }
+        if (searchClear) { searchClear.style.display = 'none'; }
+        router.navigateHome();
+    });
     wrapper.appendChild(header);
 
     const container = document.createElement('div');

@@ -348,11 +348,9 @@ body {
     letter-spacing: 0.2px;
 }
 
-/* Dot separator */
+/* Dot separator — removed, no element follows date anymore */
 .article-meta .article-date::after {
-    content: '·';
-    margin-left: 8px;
-    color: var(--text-tertiary);
+    content: none;
 }
 
 .article-read-time {
@@ -405,9 +403,7 @@ body {
 }
 
 .article-detail .article-date::after {
-    content: '·';
-    margin-left: 8px;
-    color: var(--text-tertiary);
+    content: none;
 }
 
 /* ===== Article Content - Premium Typography ===== */
