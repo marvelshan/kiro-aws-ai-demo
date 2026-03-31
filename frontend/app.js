@@ -101,21 +101,107 @@ async function handleHome() {
     }
 }
 
-// Folder emoji map for visual variety
-const FOLDER_ICONS = {
-    'k8s內部系列':    '☸️',
-    'kuberay系列':    '⚡',
-    'leetcode系列':   '🧩',
-    'observability系列': '📊',
-    'question':       '❓',
-    '小實驗':         '🔬',
-    '時事系列':       '📰',
-    '鐵人賽17th系列': '🏆',
-    '/':              '📄',
+// Folder visual config: gradient + SVG icon per topic
+const FOLDER_CONFIG = {
+    'k8s內部系列': {
+        gradient: 'linear-gradient(135deg, #0f4c81 0%, #1a6fa8 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="10" stroke="white" stroke-width="2.5" fill="none" opacity="0.9"/>
+            <line x1="24" y1="8" x2="24" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="34" x2="24" y2="40" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="8" y1="24" x2="14" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="34" y1="24" x2="40" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="12.7" y1="12.7" x2="17" y2="17" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="31" y1="31" x2="35.3" y2="35.3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="35.3" y1="12.7" x2="31" y2="17" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="17" y1="31" x2="12.7" y2="35.3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="4" fill="white" opacity="0.9"/>
+        </svg>`
+    },
+    'kuberay系列': {
+        gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+            <polygon points="24,13 32,18 32,28 24,33 16,28 16,18" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.08)" opacity="0.7"/>
+            <circle cx="24" cy="23" r="3.5" fill="white" opacity="0.9"/>
+            <line x1="24" y1="6" x2="24" y2="13" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="38" y1="14" x2="32" y2="18" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="38" y1="30" x2="32" y2="28" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="24" y1="38" x2="24" y2="33" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="10" y1="30" x2="16" y2="28" stroke="white" stroke-width="1.5" opacity="0.6"/>
+            <line x1="10" y1="14" x2="16" y2="18" stroke="white" stroke-width="1.5" opacity="0.6"/>
+        </svg>`
+    },
+    'leetcode系列': {
+        gradient: 'linear-gradient(135deg, #1a3a1a 0%, #2d5a27 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="10" width="14" height="3" rx="1.5" fill="white" opacity="0.9"/>
+            <rect x="8" y="17" width="22" height="3" rx="1.5" fill="white" opacity="0.7"/>
+            <rect x="8" y="24" width="18" height="3" rx="1.5" fill="white" opacity="0.7"/>
+            <rect x="8" y="31" width="10" height="3" rx="1.5" fill="white" opacity="0.5"/>
+            <circle cx="36" cy="34" r="7" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+            <path d="M33 34 L35.5 36.5 L39.5 31.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>`
+    },
+    'observability系列': {
+        gradient: 'linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="6,36 14,24 20,30 28,16 34,22 42,10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+            <circle cx="14" cy="24" r="2.5" fill="white" opacity="0.8"/>
+            <circle cx="20" cy="30" r="2.5" fill="white" opacity="0.8"/>
+            <circle cx="28" cy="16" r="2.5" fill="white" opacity="0.8"/>
+            <circle cx="34" cy="22" r="2.5" fill="white" opacity="0.8"/>
+            <line x1="6" y1="40" x2="42" y2="40" stroke="white" stroke-width="1.5" opacity="0.3"/>
+        </svg>`
+    },
+    'question': {
+        gradient: 'linear-gradient(135deg, #3d2000 0%, #7a4500 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="16" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+            <path d="M18 19c0-3.3 2.7-6 6-6s6 2.7 6 6c0 3-2 4.5-4 6s-2 3-2 4" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+            <circle cx="24" cy="35" r="2" fill="white" opacity="0.9"/>
+        </svg>`
+    },
+    '小實驗': {
+        gradient: 'linear-gradient(135deg, #003d3d 0%, #006666 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 8 L18 26 L10 38 L38 38 L30 26 L30 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+            <line x1="15" y1="8" x2="33" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+            <circle cx="20" cy="32" r="2" fill="white" opacity="0.7"/>
+            <circle cx="28" cy="34" r="1.5" fill="white" opacity="0.5"/>
+            <circle cx="24" cy="30" r="1" fill="white" opacity="0.4"/>
+        </svg>`
+    },
+    '時事系列': {
+        gradient: 'linear-gradient(135deg, #3d0000 0%, #7a1a1a 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="7" y="10" width="34" height="28" rx="3" stroke="white" stroke-width="2" fill="none" opacity="0.85"/>
+            <line x1="7" y1="18" x2="41" y2="18" stroke="white" stroke-width="1.5" opacity="0.5"/>
+            <rect x="12" y="22" width="10" height="10" rx="1" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)" opacity="0.8"/>
+            <line x1="26" y1="23" x2="36" y2="23" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="26" y1="27" x2="36" y2="27" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="26" y1="31" x2="33" y2="31" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>`
+    },
+    '鐵人賽17th系列': {
+        gradient: 'linear-gradient(135deg, #1a0a00 0%, #4a2800 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 6 L28 18 L40 18 L30 26 L34 38 L24 30 L14 38 L18 26 L8 18 L20 18 Z" stroke="white" stroke-width="2" stroke-linejoin="round" fill="rgba(255,255,255,0.12)" opacity="0.9"/>
+        </svg>`
+    },
+    '/': {
+        gradient: 'linear-gradient(135deg, #1c2938 0%, #2c3e50 100%)',
+        svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 14 L10 38 L38 38 L38 20 L26 20 L22 14 Z" stroke="white" stroke-width="2" stroke-linejoin="round" fill="rgba(255,255,255,0.08)" opacity="0.85"/>
+        </svg>`
+    },
 };
 
-function getFolderIcon(name) {
-    return FOLDER_ICONS[name] || '📁';
+function getFolderConfig(name) {
+    return FOLDER_CONFIG[name] || {
+        gradient: 'linear-gradient(135deg, #243447 0%, #2c3e50 100%)',
+        svg: FOLDER_CONFIG['/'].svg
+    };
 }
 
 function renderFolderGrid(folderMap) {
@@ -133,7 +219,7 @@ function renderFolderGrid(folderMap) {
     grid.className = 'folder-grid';
 
     const folders = Object.keys(folderMap).sort((a, b) => {
-        if (a === '/') return 1; // root last
+        if (a === '/') return 1;
         if (b === '/') return -1;
         return a.localeCompare(b, 'zh-TW');
     });
@@ -141,15 +227,20 @@ function renderFolderGrid(folderMap) {
     folders.forEach((folder, i) => {
         const count = folderMap[folder].length;
         const displayName = folder === '/' ? '未分類' : folder;
-        const icon = getFolderIcon(folder);
+        const config = getFolderConfig(folder);
 
         const card = document.createElement('div');
         card.className = 'folder-card';
-        card.style.animationDelay = `${i * 60}ms`;
+        card.style.animationDelay = `${i * 70}ms`;
         card.innerHTML = `
-            <div class="folder-card-icon">${icon}</div>
-            <div class="folder-card-name">${displayName}</div>
-            <div class="folder-card-count">${count} 篇文章</div>
+            <div class="folder-card-bg" style="background:${config.gradient}">
+                <div class="folder-card-svg">${config.svg}</div>
+                <div class="folder-card-overlay"></div>
+            </div>
+            <div class="folder-card-body">
+                <div class="folder-card-name">${displayName}</div>
+                <div class="folder-card-count">${count} 篇文章</div>
+            </div>
         `;
         card.addEventListener('click', () => {
             router.navigate(`/folder/${encodeURIComponent(folder)}`);
@@ -185,9 +276,9 @@ async function handleFolderView(params) {
     const folderName = decodeURIComponent(params.name);
     const articles = currentArticles.filter(a => (a.folder || '/') === folderName);
     const displayName = folderName === '/' ? '未分類' : folderName;
-    const icon = getFolderIcon(folderName);
+    const config = getFolderConfig(folderName);
 
-    renderArticleList(articles, displayName, icon);
+    renderArticleList(articles, displayName, config.gradient);
 }
 
 // ===== Article List =====
@@ -197,7 +288,7 @@ async function handleArticleList() {
     router.navigate('/');
 }
 
-function renderArticleList(articles, folderName, icon) {
+function renderArticleList(articles, folderName, gradient) {
     const content = document.getElementById('content');
 
     if (!articles || articles.length === 0) {
@@ -210,12 +301,14 @@ function renderArticleList(articles, folderName, icon) {
     const wrapper = document.createElement('div');
     wrapper.className = 'folder-article-page';
 
-    // Back button + title
     const header = document.createElement('div');
     header.className = 'folder-article-header';
     header.innerHTML = `
         <button class="folder-back-btn" aria-label="返回分類">← 返回</button>
-        <h2 class="page-title">${icon} ${folderName} <span class="folder-article-count">${articles.length}</span></h2>
+        <div class="folder-article-title-wrap">
+            <div class="folder-article-accent" style="background:${gradient || 'var(--pacific-blue)'}"></div>
+            <h2 class="page-title">${folderName} <span class="folder-article-count">${articles.length}</span></h2>
+        </div>
     `;
     header.querySelector('.folder-back-btn').addEventListener('click', () => router.navigateHome());
     wrapper.appendChild(header);

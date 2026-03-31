@@ -1323,26 +1323,24 @@ html {
 
 .folder-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
     margin-top: 8px;
 }
 
 .folder-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 32px 24px;
+    overflow: hidden;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
-    transition: var(--transition);
+    border: 1px solid var(--border-color);
     opacity: 0;
     transform: translateY(16px);
     animation: folderCardIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease;
 }
 
 @keyframes folderCardIn {
@@ -1351,29 +1349,63 @@ html {
 
 .folder-card:hover {
     transform: translateY(-6px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(29, 155, 240, 0.45);
-    background: var(--bg-tertiary);
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(29, 155, 240, 0.4);
 }
 
-.folder-card-icon {
-    font-size: 40px;
-    line-height: 1;
-    filter: drop-shadow(0 2px 8px rgba(29, 155, 240, 0.3));
-    transition: transform 0.3s ease;
+/* Gradient image area */
+.folder-card-bg {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.folder-card:hover .folder-card-icon {
-    transform: scale(1.15) rotate(-4deg);
+.folder-card-svg {
+    width: 72px;
+    height: 72px;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+.folder-card-svg svg {
+    width: 100%;
+    height: 100%;
+}
+
+.folder-card:hover .folder-card-svg {
+    transform: scale(1.12) translateY(-4px);
+}
+
+/* Subtle noise/grain overlay for texture */
+.folder-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Text area */
+.folder-card-body {
+    background: var(--bg-secondary);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
 
 .folder-card-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.2px;
     line-height: 1.3;
-    word-break: break-all;
 }
 
 .folder-card-count {
@@ -1381,9 +1413,11 @@ html {
     color: var(--pacific-blue-light);
     background: rgba(29, 155, 240, 0.12);
     border: 1px solid rgba(29, 155, 240, 0.2);
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 20px;
     font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* ===== Folder Article List Page ===== */
@@ -1398,6 +1432,19 @@ html {
     gap: 20px;
     margin-bottom: 32px;
     flex-wrap: wrap;
+}
+
+.folder-article-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.folder-article-accent {
+    width: 4px;
+    height: 36px;
+    border-radius: 2px;
+    flex-shrink: 0;
 }
 
 .folder-article-header .page-title {
@@ -1438,16 +1485,17 @@ html {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .folder-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 14px;
     }
 
-    .folder-card {
-        padding: 24px 16px;
+    .folder-card-bg {
+        height: 110px;
     }
 
-    .folder-card-icon {
-        font-size: 32px;
+    .folder-card-svg {
+        width: 56px;
+        height: 56px;
     }
 
     .folder-article-header {
