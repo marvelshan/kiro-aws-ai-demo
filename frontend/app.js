@@ -82,11 +82,11 @@ function renderFolderTree(folderMap, container) {
     }
 }
 
-// ===== Article List =====
+// ===== Folder Grid (Home) =====
 
-async function handleArticleList() {
+async function handleHome() {
     const content = document.getElementById('content');
-    content.innerHTML = '<div class="loading">載入文章列表中...</div>';
+    content.innerHTML = '<div class="loading">載入中...</div>';
 
     try {
         const response = await fetch('articles/list.json');
@@ -95,13 +95,109 @@ async function handleArticleList() {
         const data = await response.json();
         currentArticles = data.articles || [];
         articleSearch.initialize(currentArticles);
-        renderArticleList(currentArticles, buildFolderMap(currentArticles));
+        renderFolderGrid(buildFolderMap(currentArticles));
     } catch (error) {
-        renderError('載入失敗', '無法載入文章列表，請檢查網路連線', () => handleArticleList());
+        renderError('載入失敗', '無法載入文章列表，請檢查網路連線', () => handleHome());
     }
 }
 
-function renderArticleList(articles, folderMap) {
+// Folder emoji map for visual variety
+const FOLDER_ICONS = {
+    'k8s內部系列':    '☸️',
+    'kuberay系列':    '⚡',
+    'leetcode系列':   '🧩',
+    'observability系列': '📊',
+    'question':       '❓',
+    '小實驗':         '🔬',
+    '時事系列':       '📰',
+    '鐵人賽17th系列': '🏆',
+    '/':              '📄',
+};
+
+function getFolderIcon(name) {
+    return FOLDER_ICONS[name] || '📁';
+}
+
+function renderFolderGrid(folderMap) {
+    const content = document.getElementById('content');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'folder-grid-page';
+
+    const title = document.createElement('h2');
+    title.className = 'page-title';
+    title.textContent = '筆記分類';
+    wrapper.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'folder-grid';
+
+    const folders = Object.keys(folderMap).sort((a, b) => {
+        if (a === '/') return 1; // root last
+        if (b === '/') return -1;
+        return a.localeCompare(b, 'zh-TW');
+    });
+
+    folders.forEach((folder, i) => {
+        const count = folderMap[folder].length;
+        const displayName = folder === '/' ? '未分類' : folder;
+        const icon = getFolderIcon(folder);
+
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+        card.style.animationDelay = `${i * 60}ms`;
+        card.innerHTML = `
+            <div class="folder-card-icon">${icon}</div>
+            <div class="folder-card-name">${displayName}</div>
+            <div class="folder-card-count">${count} 篇文章</div>
+        `;
+        card.addEventListener('click', () => {
+            router.navigate(`/folder/${encodeURIComponent(folder)}`);
+        });
+        grid.appendChild(card);
+    });
+
+    wrapper.appendChild(grid);
+    content.innerHTML = '';
+    content.appendChild(wrapper);
+}
+
+// ===== Folder Article List =====
+
+async function handleFolderView(params) {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading">載入中...</div>';
+
+    // Ensure articles are loaded
+    if (currentArticles.length === 0) {
+        try {
+            const response = await fetch('articles/list.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            currentArticles = data.articles || [];
+            articleSearch.initialize(currentArticles);
+        } catch (error) {
+            renderError('載入失敗', '無法載入文章列表，請檢查網路連線', () => handleFolderView(params));
+            return;
+        }
+    }
+
+    const folderName = decodeURIComponent(params.name);
+    const articles = currentArticles.filter(a => (a.folder || '/') === folderName);
+    const displayName = folderName === '/' ? '未分類' : folderName;
+    const icon = getFolderIcon(folderName);
+
+    renderArticleList(articles, displayName, icon);
+}
+
+// ===== Article List =====
+
+async function handleArticleList() {
+    // Redirect old list route to home
+    router.navigate('/');
+}
+
+function renderArticleList(articles, folderName, icon) {
     const content = document.getElementById('content');
 
     if (!articles || articles.length === 0) {
@@ -111,21 +207,22 @@ function renderArticleList(articles, folderMap) {
         return;
     }
 
-    const listClone = document.getElementById('article-list-template').content.cloneNode(true);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'folder-article-page';
 
-    // Render folder tree
-    const folderTree = listClone.getElementById('folder-tree');
-    if (folderMap) renderFolderTree(folderMap, folderTree);
+    // Back button + title
+    const header = document.createElement('div');
+    header.className = 'folder-article-header';
+    header.innerHTML = `
+        <button class="folder-back-btn" aria-label="返回分類">← 返回</button>
+        <h2 class="page-title">${icon} ${folderName} <span class="folder-article-count">${articles.length}</span></h2>
+    `;
+    header.querySelector('.folder-back-btn').addEventListener('click', () => router.navigateHome());
+    wrapper.appendChild(header);
 
-    // Update page title
-    const pageTitle = listClone.querySelector('.page-title');
-    if (activeFolder === '/') {
-        pageTitle.textContent = `所有文章 (${articles.length})`;
-    } else {
-        pageTitle.textContent = `📁 ${activeFolder} (${articles.length})`;
-    }
-
-    const container = listClone.getElementById('articles-container');
+    const container = document.createElement('div');
+    container.id = 'articles-container';
+    wrapper.appendChild(container);
 
     for (const article of articles) {
         const itemClone = document.getElementById('article-item-template').content.cloneNode(true);
@@ -149,8 +246,7 @@ function renderArticleList(articles, folderMap) {
     }
 
     content.innerHTML = '';
-    content.appendChild(listClone);
-    // Trigger scroll-reveal for newly rendered cards
+    content.appendChild(wrapper);
     requestAnimationFrame(initScrollReveal);
 }
 
@@ -398,22 +494,21 @@ function initializeSearch() {
 }
 
 function performSearch(query) {
-    const results = articleSearch.search(query);
-    const folderMap = buildFolderMap(results);
-    activeFolder = '/';
-    renderArticleList(results, folderMap);
-
-    const pageTitle = document.querySelector('.page-title');
-    if (pageTitle) {
-        pageTitle.textContent = query
-            ? `搜尋結果: "${query}" (${results.length} 篇文章)`
-            : `所有文章 (${results.length})`;
+    if (!query.trim()) {
+        // Empty search — go back to folder grid
+        if (currentArticles.length > 0) {
+            renderFolderGrid(buildFolderMap(currentArticles));
+        }
+        return;
     }
+    const results = articleSearch.search(query);
+    renderArticleList(results, `搜尋「${query}」`, '🔍');
 }
 
 // ===== Routes =====
 
-router.addRoute('/', handleArticleList);
+router.addRoute('/', handleHome);
+router.addRoute('/folder/:name', handleFolderView);
 router.addRoute('/article/:id', handleArticleDetail);
 router.setNotFoundHandler(handleNotFound);
 

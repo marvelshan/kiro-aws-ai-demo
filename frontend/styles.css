@@ -1314,3 +1314,145 @@ html {
 
 /* Remove the static ← from template since we add it via ::before */
 /* Keep it as-is since template has the text already */
+
+/* ===== Folder Grid (Home Page) ===== */
+
+.folder-grid-page {
+    padding-top: 8px;
+}
+
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 8px;
+}
+
+.folder-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: folderCardIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes folderCardIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.folder-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(29, 155, 240, 0.45);
+    background: var(--bg-tertiary);
+}
+
+.folder-card-icon {
+    font-size: 40px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 8px rgba(29, 155, 240, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.folder-card:hover .folder-card-icon {
+    transform: scale(1.15) rotate(-4deg);
+}
+
+.folder-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+    line-height: 1.3;
+    word-break: break-all;
+}
+
+.folder-card-count {
+    font-size: 12px;
+    color: var(--pacific-blue-light);
+    background: rgba(29, 155, 240, 0.12);
+    border: 1px solid rgba(29, 155, 240, 0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ===== Folder Article List Page ===== */
+
+.folder-article-page {
+    padding-top: 8px;
+}
+
+.folder-article-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.folder-article-header .page-title {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.folder-article-count {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.folder-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: rgba(29, 155, 240, 0.12);
+    border: 1px solid rgba(29, 155, 240, 0.25);
+    border-radius: var(--radius-md);
+    color: var(--pacific-blue-light);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.folder-back-btn:hover {
+    background: rgba(29, 155, 240, 0.22);
+    transform: translateX(-3px);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .folder-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+    }
+
+    .folder-card {
+        padding: 24px 16px;
+    }
+
+    .folder-card-icon {
+        font-size: 32px;
+    }
+
+    .folder-article-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
