@@ -1,45 +1,44 @@
 import { readFile, stat } from 'fs/promises';
-import { basename, extname } from 'path';
+import { basename, extname, relative, dirname } from 'path';
 import matter from 'gray-matter';
 
 /**
  * Parses frontmatter from a markdown file
  * @param {string} filePath - Path to the markdown file
+ * @param {string} sourceDir - Root source directory (for computing relative folder)
  * @returns {Promise<Object>} Article metadata
  */
-export async function parseArticleMetadata(filePath) {
+export async function parseArticleMetadata(filePath, sourceDir = '') {
   try {
     const content = await readFile(filePath, 'utf-8');
     const parsed = matter(content);
     
-    // Check if frontmatter exists and has required fields
+    // Compute folder relative to sourceDir
+    const folder = sourceDir
+      ? relative(sourceDir, dirname(filePath)) || '/'
+      : '/';
+
+    const base = {
+      id: generateId(filePath),
+      filename: basename(filePath),
+      folder,
+    };
+
     if (parsed.data && Object.keys(parsed.data).length > 0) {
       const { title, date, description, tags } = parsed.data;
-      
-      // Use frontmatter data if available
       const metadata = {
-        id: generateId(filePath),
+        ...base,
         title: title || generateTitleFromFilename(filePath),
         date: date ? formatDate(date) : await getFileModificationDate(filePath),
-        filename: basename(filePath),
       };
-      
-      // Add optional fields if present
-      if (description) {
-        metadata.description = description;
-      }
-      if (tags && Array.isArray(tags)) {
-        metadata.tags = tags;
-      }
-      
+      if (description) metadata.description = description;
+      if (tags && Array.isArray(tags)) metadata.tags = tags;
       return metadata;
     } else {
-      // Fallback: use filename and file modification time
       return {
-        id: generateId(filePath),
+        ...base,
         title: generateTitleFromFilename(filePath),
         date: await getFileModificationDate(filePath),
-        filename: basename(filePath),
       };
     }
   } catch (error) {

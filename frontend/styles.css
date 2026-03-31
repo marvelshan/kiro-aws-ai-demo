@@ -205,6 +205,82 @@ body {
     line-height: 1.2;
 }
 
+/* ===== Article List Layout (sidebar + main) ===== */
+.article-list-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+}
+
+/* ===== Folder Sidebar ===== */
+.folder-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px 16px;
+    position: sticky;
+    top: 100px;
+}
+
+.folder-header {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.folder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 4px;
+}
+
+.folder-item:hover {
+    background: var(--bg-secondary);
+}
+
+.folder-item.active {
+    background: rgba(29, 155, 240, 0.15);
+    border: 1px solid rgba(29, 155, 240, 0.3);
+}
+
+.folder-name {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.folder-item.active .folder-name {
+    color: var(--pacific-blue-light);
+}
+
+.folder-count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    background: var(--bg-tertiary);
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin-left: 6px;
+}
+
+.article-list-main {
+    flex: 1;
+    min-width: 0;
+}
+
 /* ===== Article List ===== */
 .article-list {
     background: var(--bg-primary);
@@ -250,13 +326,40 @@ body {
     background-size: 100% 2px;
 }
 
-.article-item .article-date {
+/* Article meta row (date + views) */
+.article-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.article-date {
     display: block;
     color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.3px;
 }
+
+.article-views {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+@media (max-width: 768px) {
+    .article-list-layout {
+        flex-direction: column;
+    }
+    .folder-sidebar {
+        width: 100%;
+        position: static;
+    }
+}
+
 
 /* ===== Article Detail ===== */
 .article-detail {

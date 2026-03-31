@@ -8,49 +8,32 @@
     <title>部落格</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    
-    <!-- Markdown parser and syntax highlighting -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
-    <!-- Main container -->
     <div id="app">
-        <!-- Header -->
         <header class="header">
             <div class="container">
                 <h1 class="site-title">
                     <a href="#/" id="home-link">我的部落格</a>
                 </h1>
-                
-                <!-- Search and GitHub Import -->
                 <div class="header-actions">
-                    <!-- Search Bar -->
                     <div class="search-container">
-                        <input 
-                            type="text" 
-                            id="search-input" 
-                            class="search-input" 
-                            placeholder="搜尋文章..."
-                            aria-label="搜尋文章"
-                        />
-                        <button id="search-clear" class="search-clear" style="display: none;" aria-label="清除搜尋">
-                            ✕
-                        </button>
+                        <input type="text" id="search-input" class="search-input"
+                            placeholder="搜尋文章..." aria-label="搜尋文章" />
+                        <button id="search-clear" class="search-clear" style="display:none;" aria-label="清除搜尋">✕</button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Main content area - dynamically populated -->
         <main class="main-content">
             <div class="container" id="content">
-                <!-- Article list or article detail will be rendered here -->
                 <div class="loading">載入中...</div>
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="container">
                 <p>&copy; 2024 我的部落格. All rights reserved.</p>
@@ -58,14 +41,18 @@
         </footer>
     </div>
 
-    <!-- Templates for dynamic content -->
-    
     <!-- Article list template -->
     <template id="article-list-template">
-        <div class="article-list">
-            <h2 class="page-title">所有文章</h2>
-            <div id="articles-container">
-                <!-- Articles will be inserted here -->
+        <div class="article-list-layout">
+            <!-- Sidebar folder tree -->
+            <aside class="folder-sidebar">
+                <div class="folder-header">📁 資料夾</div>
+                <div id="folder-tree"></div>
+            </aside>
+            <!-- Main article list -->
+            <div class="article-list-main">
+                <h2 class="page-title">所有文章</h2>
+                <div id="articles-container"></div>
             </div>
         </div>
     </template>
@@ -76,7 +63,10 @@
             <h3 class="article-title">
                 <a href="#" class="article-link"></a>
             </h3>
-            <time class="article-date"></time>
+            <div class="article-meta">
+                <time class="article-date"></time>
+                <span class="article-views">👁 <span class="views-count">0</span> 次瀏覽</span>
+            </div>
         </article>
     </template>
 
@@ -85,11 +75,12 @@
         <article class="article-detail">
             <div class="article-header">
                 <h2 class="article-title"></h2>
-                <time class="article-date"></time>
+                <div class="article-meta">
+                    <time class="article-date"></time>
+                    <span class="article-views">👁 <span class="views-count">0</span> 次瀏覽</span>
+                </div>
             </div>
-            <div class="article-content">
-                <!-- Markdown content will be rendered here -->
-            </div>
+            <div class="article-content"></div>
             <nav class="article-nav">
                 <a href="#/" class="back-link">← 返回文章列表</a>
             </nav>
@@ -102,8 +93,8 @@
             <h2 class="error-title"></h2>
             <p class="error-text"></p>
             <div class="error-actions">
-                <button class="retry-button" style="display: none;">重試</button>
-                <a href="#/" class="back-link" style="display: none;">返回首頁</a>
+                <button class="retry-button" style="display:none;">重試</button>
+                <a href="#/" class="back-link" style="display:none;">返回首頁</a>
             </div>
         </div>
     </template>
@@ -116,7 +107,6 @@
         </div>
     </template>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script type="module" src="app.js"></script>

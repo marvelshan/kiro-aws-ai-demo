@@ -1,224 +1,34 @@
 /**
  * Main application entry point
- * Initializes router and sets up basic application structure
  */
 
 import Router from './router.js';
 import ArticleSearch from './search.js';
 
-// Initialize router
 const router = new Router();
-
-// Initialize search
 const articleSearch = new ArticleSearch();
 
-// Store current articles
 let currentArticles = [];
+let activeFolder = '/'; // currently selected folder
 
-/**
- * Error logger utility
- * Logs errors to console with timestamp and context
- * Requirements: 7.5
- */
-class ErrorLogger {
-    /**
-     * Log an error with context
-     * @param {string} context - Context where error occurred
-     * @param {Error} error - Error object
-     * @param {Object} additionalInfo - Additional information
-     */
-    static log(context, error, additionalInfo = {}) {
-        const timestamp = new Date().toISOString();
-        const errorInfo = {
-            timestamp,
-            context,
-            message: error.message,
-            stack: error.stack,
-            ...additionalInfo
-        };
-        
-        console.error(`[${timestamp}] Error in ${context}:`, errorInfo);
-        
-        return errorInfo;
-    }
-    
-    /**
-     * Log a network error
-     * @param {string} url - URL that failed
-     * @param {Error} error - Error object
-     * @param {number} status - HTTP status code if available
-     */
-    static logNetworkError(url, error, status = null) {
-        return this.log('Network Request', error, {
-            url,
-            status,
-            type: 'network'
-        });
-    }
-    
-    /**
-     * Log a parse error
-     * @param {string} contentType - Type of content being parsed
-     * @param {Error} error - Error object
-     */
-    static logParseError(contentType, error) {
-        return this.log('Content Parsing', error, {
-            contentType,
-            type: 'parse'
-        });
-    }
-    
-    /**
-     * Log a not found error
-     * @param {string} resourceType - Type of resource not found
-     * @param {string} resourceId - ID of resource
-     */
-    static logNotFound(resourceType, resourceId) {
-        const error = new Error(`${resourceType} not found: ${resourceId}`);
-        return this.log('Resource Not Found', error, {
-            resourceType,
-            resourceId,
-            type: 'not_found'
-        });
-    }
+// ===== View Count (localStorage) =====
+
+function getViewKey(articleId) {
+    return `views_${articleId}`;
 }
 
-/**
- * Handle article list route
- * Fetches articles/list.json and renders the article list
- * Requirements: 1.1, 1.2, 1.4
- */
-async function handleArticleList(params) {
-    const content = document.getElementById('content');
-    content.innerHTML = '<div class="loading">載入文章列表中...</div>';
-    
-    console.log('handleArticleList called');
-    
-    try {
-        // Fetch article list from local files (now from Git submodule)
-        console.log('Fetching articles from Git submodule');
-        const response = await fetch('articles/list.json');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const articles = data.articles || [];
-        currentArticles = articles;
-        
-        // Initialize search with articles
-        articleSearch.initialize(articles);
-        
-        // Render article list
-        renderArticleList(articles);
-        
-    } catch (error) {
-        ErrorLogger.logNetworkError('articles/list.json', error);
-        renderArticleListError(error);
-    }
+function getViewCount(articleId) {
+    return parseInt(localStorage.getItem(getViewKey(articleId)) || '0', 10);
 }
 
-/**
- * Render the article list
- * @param {Array} articles - Array of article metadata objects
- */
-function renderArticleList(articles) {
-    console.log('renderArticleList called with', articles.length, 'articles');
-    const content = document.getElementById('content');
-    
-    // Handle empty state
-    if (!articles || articles.length === 0) {
-        console.log('No articles to display');
-        const emptyTemplate = document.getElementById('empty-state-template');
-        const clone = emptyTemplate.content.cloneNode(true);
-        
-        // Update empty state message
-        const emptyTitle = clone.querySelector('h2');
-        const emptyText = clone.querySelector('p');
-        
-        emptyTitle.textContent = '目前還沒有文章';
-        emptyText.textContent = '敬請期待更多精彩內容';
-        
-        content.innerHTML = '';
-        content.appendChild(clone);
-        return;
-    }
-    
-    console.log('Rendering articles:', articles.map(a => a.title));
-    
-    // Get article list template
-    const listTemplate = document.getElementById('article-list-template');
-    const listClone = listTemplate.content.cloneNode(true);
-    
-    // Update page title
-    const pageTitle = listClone.querySelector('.page-title');
-    pageTitle.textContent = '所有文章';
-    
-    const articlesContainer = listClone.getElementById('articles-container');
-    
-    // Render each article
-    articles.forEach(article => {
-        const itemTemplate = document.getElementById('article-item-template');
-        const itemClone = itemTemplate.content.cloneNode(true);
-        
-        // Set article title and link
-        const link = itemClone.querySelector('.article-link');
-        link.textContent = article.title;
-        link.href = `#/article/${article.id}`;
-        
-        // Add click handler for navigation
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            router.navigateToArticle(article.id);
-        });
-        
-        // Set article date
-        const dateElement = itemClone.querySelector('.article-date');
-        dateElement.textContent = formatDisplayDate(article.date);
-        dateElement.setAttribute('datetime', article.date);
-        
-        articlesContainer.appendChild(itemClone);
-    });
-    
-    // Replace content
-    content.innerHTML = '';
-    content.appendChild(listClone);
+function incrementViewCount(articleId) {
+    const count = getViewCount(articleId) + 1;
+    localStorage.setItem(getViewKey(articleId), count);
+    return count;
 }
 
-/**
- * Render error state for article list
- * Requirements: 7.2, 7.5
- * @param {Error} error - Error object
- */
-function renderArticleListError(error) {
-    const content = document.getElementById('content');
-    const template = document.getElementById('error-template');
-    const clone = template.content.cloneNode(true);
-    
-    clone.querySelector('.error-title').textContent = '載入失敗';
-    clone.querySelector('.error-text').textContent = '無法載入文章列表，請檢查網路連線';
-    
-    // Show retry button
-    const retryButton = clone.querySelector('.retry-button');
-    retryButton.style.display = 'inline-block';
-    retryButton.addEventListener('click', () => {
-        ErrorLogger.log('User Action', new Error('Retry button clicked'), {
-            action: 'retry',
-            context: 'article-list'
-        });
-        handleArticleList({});
-    });
-    
-    content.innerHTML = '';
-    content.appendChild(clone);
-}
+// ===== Date Formatting =====
 
-/**
- * Format date for display
- * @param {string} dateString - ISO date string
- * @returns {string} Formatted date
- */
 function formatDisplayDate(dateString) {
     try {
         const date = new Date(dateString);
@@ -227,417 +37,331 @@ function formatDisplayDate(dateString) {
             month: 'long',
             day: 'numeric'
         });
-    } catch (error) {
+    } catch {
         return dateString;
     }
 }
 
+// ===== Folder Tree =====
+
 /**
- * Handle article detail route
- * Loads markdown file and renders article detail
- * Requirements: 2.1, 2.2, 2.3, 2.4, 6.1, 6.2
+ * Build a nested folder structure from flat article list
+ * Returns { '/': [...], 'question': [...], ... }
  */
+function buildFolderMap(articles) {
+    const map = {};
+    for (const article of articles) {
+        const folder = article.folder || '/';
+        if (!map[folder]) map[folder] = [];
+        map[folder].push(article);
+    }
+    return map;
+}
+
+/**
+ * Render the folder sidebar tree
+ */
+function renderFolderTree(folderMap, container) {
+    container.innerHTML = '';
+
+    // Sort: root first, then alphabetically
+    const folders = Object.keys(folderMap).sort((a, b) => {
+        if (a === '/') return -1;
+        if (b === '/') return 1;
+        return a.localeCompare(b);
+    });
+
+    for (const folder of folders) {
+        const count = folderMap[folder].length;
+        const label = folder === '/' ? '📂 根目錄' : `📁 ${folder}`;
+
+        const item = document.createElement('div');
+        item.className = 'folder-item' + (folder === activeFolder ? ' active' : '');
+        item.innerHTML = `<span class="folder-name">${label}</span><span class="folder-count">${count}</span>`;
+        item.addEventListener('click', () => {
+            activeFolder = folder;
+            // Re-render with filtered articles
+            const filtered = folderMap[folder];
+            renderArticleList(filtered, folderMap);
+        });
+        container.appendChild(item);
+    }
+}
+
+// ===== Article List =====
+
+async function handleArticleList() {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading">載入文章列表中...</div>';
+
+    try {
+        const response = await fetch('articles/list.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.json();
+        currentArticles = data.articles || [];
+        articleSearch.initialize(currentArticles);
+        renderArticleList(currentArticles, buildFolderMap(currentArticles));
+    } catch (error) {
+        renderError('載入失敗', '無法載入文章列表，請檢查網路連線', () => handleArticleList());
+    }
+}
+
+function renderArticleList(articles, folderMap) {
+    const content = document.getElementById('content');
+
+    if (!articles || articles.length === 0) {
+        const clone = document.getElementById('empty-state-template').content.cloneNode(true);
+        content.innerHTML = '';
+        content.appendChild(clone);
+        return;
+    }
+
+    const listClone = document.getElementById('article-list-template').content.cloneNode(true);
+
+    // Render folder tree
+    const folderTree = listClone.getElementById('folder-tree');
+    if (folderMap) renderFolderTree(folderMap, folderTree);
+
+    // Update page title
+    const pageTitle = listClone.querySelector('.page-title');
+    if (activeFolder === '/') {
+        pageTitle.textContent = `所有文章 (${articles.length})`;
+    } else {
+        pageTitle.textContent = `📁 ${activeFolder} (${articles.length})`;
+    }
+
+    const container = listClone.getElementById('articles-container');
+
+    for (const article of articles) {
+        const itemClone = document.getElementById('article-item-template').content.cloneNode(true);
+
+        const link = itemClone.querySelector('.article-link');
+        link.textContent = article.title;
+        link.href = `#/article/${article.id}`;
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            router.navigateToArticle(article.id);
+        });
+
+        const dateEl = itemClone.querySelector('.article-date');
+        dateEl.textContent = formatDisplayDate(article.date);
+        dateEl.setAttribute('datetime', article.date);
+
+        const viewsEl = itemClone.querySelector('.views-count');
+        viewsEl.textContent = getViewCount(article.id);
+
+        container.appendChild(itemClone);
+    }
+
+    content.innerHTML = '';
+    content.appendChild(listClone);
+}
+
+// ===== Article Detail =====
+
 async function handleArticleDetail(params) {
     const content = document.getElementById('content');
-    content.innerHTML = `<div class="loading">載入文章中...</div>`;
-    
-    console.log('handleArticleDetail called for:', params.id);
-    
+    content.innerHTML = '<div class="loading">載入文章中...</div>';
+
     try {
-        // Load article metadata from list.json to get filename
-        const listResponse = await fetch('articles/list.json');
-        if (!listResponse.ok) {
-            throw new Error('Failed to load article list');
-        }
-        
-        const listData = await listResponse.json();
-        const article = listData.articles.find(a => a.id === params.id);
-        
+        const response = await fetch('articles/list.json');
+        if (!response.ok) throw new Error('Failed to load article list');
+
+        const data = await response.json();
+        const article = data.articles.find(a => a.id === params.id);
+
         if (!article) {
-            // Article not found in list
-            ErrorLogger.logNotFound('Article', params.id);
-            renderArticleNotFound(params.id);
+            renderError('找不到此文章', '此文章可能已被移除或不存在', null, true);
             return;
         }
-        
-        // Fetch markdown file from local files (Git submodule)
-        const markdownResponse = await fetch(`articles/${article.filename}`);
-        
-        if (!markdownResponse.ok) {
-            if (markdownResponse.status === 404) {
-                ErrorLogger.logNotFound('Article File', article.filename);
-                renderArticleNotFound(params.id);
-                return;
-            }
-            throw new Error(`HTTP error! status: ${markdownResponse.status}`);
+
+        // Article path: preserve folder structure
+        const articlePath = article.folder && article.folder !== '/'
+            ? `articles/${article.folder}/${article.filename}`
+            : `articles/${article.filename}`;
+
+        const mdResponse = await fetch(articlePath);
+        if (!mdResponse.ok) {
+            renderError('找不到此文章', '此文章可能已被移除或不存在', null, true);
+            return;
         }
-        
-        const markdownContent = await markdownResponse.text();
-        
-        // Parse markdown to HTML
+
+        const markdownContent = await mdResponse.text();
         const htmlContent = parseMarkdown(markdownContent);
-        
-        // Render article detail
-        renderArticleDetail(article, htmlContent);
-        
+
+        // Increment and get view count
+        const views = incrementViewCount(article.id);
+
+        renderArticleDetail(article, htmlContent, views);
     } catch (error) {
-        ErrorLogger.logNetworkError(`articles/${params.id}`, error);
-        renderArticleDetailError(error, params.id);
+        renderError('載入失敗', error.message || '無法載入文章，請檢查網路連線',
+            () => router.handleRouteChange());
     }
 }
 
-/**
- * Parse markdown content to HTML
- * Uses marked.js with highlight.js for code syntax highlighting
- * Requirements: 2.2, 2.3, 3.1, 3.2, 3.3, 3.4
- * @param {string} markdown - Markdown content
- * @returns {string} HTML content
- */
+function renderArticleDetail(article, htmlContent, views) {
+    const content = document.getElementById('content');
+    const clone = document.getElementById('article-detail-template').content.cloneNode(true);
+
+    clone.querySelector('.article-title').textContent = article.title;
+
+    const dateEl = clone.querySelector('.article-date');
+    dateEl.textContent = formatDisplayDate(article.date);
+    dateEl.setAttribute('datetime', article.date);
+
+    clone.querySelector('.views-count').textContent = views;
+    clone.querySelector('.article-content').innerHTML = htmlContent;
+
+    const backLink = clone.querySelector('.back-link');
+    backLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        router.navigateHome();
+    });
+
+    content.innerHTML = '';
+    content.appendChild(clone);
+
+    if (typeof hljs !== 'undefined') {
+        content.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    }
+    addCopyButtons();
+}
+
+// ===== Markdown =====
+
 function parseMarkdown(markdown) {
-    try {
-        // Configure marked with highlight.js
-        if (typeof marked !== 'undefined') {
-            marked.setOptions({
-                highlight: function(code, lang) {
-                    if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
-                        try {
-                            return hljs.highlight(code, { language: lang }).value;
-                        } catch (err) {
-                            console.error('Highlight error:', err);
-                        }
-                    }
-                    return code;
-                },
-                breaks: true,
-                gfm: true
-            });
-            
-            return marked.parse(markdown);
-        } else {
-            ErrorLogger.log('Dependency Missing', new Error('marked.js not loaded'), {
-                library: 'marked.js'
-            });
-            return `<pre>${escapeHtml(markdown)}</pre>`;
-        }
-    } catch (error) {
-        ErrorLogger.logParseError('Markdown', error);
-        throw new Error('文章格式解析失敗');
-    }
+    if (typeof marked === 'undefined') return `<pre>${escapeHtml(markdown)}</pre>`;
+    marked.setOptions({
+        highlight: (code, lang) => {
+            if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                try { return hljs.highlight(code, { language: lang }).value; } catch {}
+            }
+            return code;
+        },
+        breaks: true,
+        gfm: true
+    });
+    return marked.parse(markdown);
 }
 
-/**
- * Escape HTML to prevent XSS
- * @param {string} text - Text to escape
- * @returns {string} Escaped text
- */
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-/**
- * Render article detail view
- * Requirements: 2.1, 2.2, 2.3, 2.4, 6.1, 6.2
- * @param {Object} article - Article metadata
- * @param {string} htmlContent - Parsed HTML content
- */
-function renderArticleDetail(article, htmlContent) {
-    const content = document.getElementById('content');
-    const template = document.getElementById('article-detail-template');
-    const clone = template.content.cloneNode(true);
-    
-    // Set article title
-    clone.querySelector('.article-title').textContent = article.title;
-    
-    // Set article date
-    const dateElement = clone.querySelector('.article-date');
-    dateElement.textContent = formatDisplayDate(article.date);
-    dateElement.setAttribute('datetime', article.date);
-    
-    // Set article content
-    clone.querySelector('.article-content').innerHTML = htmlContent;
-    
-    // Set up back navigation
-    const backLink = clone.querySelector('.back-link');
-    backLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        router.navigateHome();
-    });
-    
-    // Replace content
-    content.innerHTML = '';
-    content.appendChild(clone);
-    
-    // Apply syntax highlighting to code blocks
-    if (typeof hljs !== 'undefined') {
-        content.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightElement(block);
-        });
-    }
-    
-    // Add copy buttons to code blocks
-    addCopyButtonsToCodeBlocks();
-}
-
-/**
- * Add copy buttons to all code blocks
- */
-function addCopyButtonsToCodeBlocks() {
-    const codeBlocks = document.querySelectorAll('.article-content pre');
-    
-    codeBlocks.forEach((pre) => {
-        // Skip if button already exists
-        if (pre.querySelector('.copy-button')) {
-            return;
-        }
-        
-        // Create copy button
-        const button = document.createElement('button');
-        button.className = 'copy-button';
-        button.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5.5 2.5h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <path d="M3.5 5.5h-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            </svg>
-            <span class="copy-text">複製</span>
-        `;
-        button.setAttribute('aria-label', '複製程式碼');
-        
-        // Add click handler
-        button.addEventListener('click', async () => {
-            const code = pre.querySelector('code');
-            const text = code.textContent;
-            
+function addCopyButtons() {
+    document.querySelectorAll('.article-content pre').forEach(pre => {
+        if (pre.querySelector('.copy-button')) return;
+        const btn = document.createElement('button');
+        btn.className = 'copy-button';
+        btn.setAttribute('aria-label', '複製程式碼');
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M5.5 2.5h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M3.5 5.5h-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg><span class="copy-text">複製</span>`;
+        btn.addEventListener('click', async () => {
+            const text = pre.querySelector('code')?.textContent || '';
             try {
                 await navigator.clipboard.writeText(text);
-                
-                // Show success feedback
-                button.classList.add('copied');
-                const textSpan = button.querySelector('.copy-text');
-                textSpan.textContent = '已複製！';
-                
-                // Reset after 2 seconds
-                setTimeout(() => {
-                    button.classList.remove('copied');
-                    textSpan.textContent = '複製';
-                }, 2000);
-                
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                
-                try {
-                    document.execCommand('copy');
-                    button.classList.add('copied');
-                    const textSpan = button.querySelector('.copy-text');
-                    textSpan.textContent = '已複製！';
-                    
-                    setTimeout(() => {
-                        button.classList.remove('copied');
-                        textSpan.textContent = '複製';
-                    }, 2000);
-                } catch (err2) {
-                    console.error('Fallback copy failed:', err2);
-                }
-                
-                document.body.removeChild(textArea);
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
             }
+            btn.classList.add('copied');
+            btn.querySelector('.copy-text').textContent = '已複製！';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.querySelector('.copy-text').textContent = '複製';
+            }, 2000);
         });
-        
-        // Add button to pre element
         pre.style.position = 'relative';
-        pre.appendChild(button);
+        pre.appendChild(btn);
     });
 }
 
-/**
- * Render article not found (404) page
- * Requirements: 7.1
- * @param {string} articleId - Article ID that was not found
- */
-function renderArticleNotFound(articleId) {
+// ===== Error =====
+
+function renderError(title, text, retryFn, showBack = false) {
     const content = document.getElementById('content');
-    const template = document.getElementById('error-template');
-    const clone = template.content.cloneNode(true);
-    
-    clone.querySelector('.error-title').textContent = '找不到此文章';
-    clone.querySelector('.error-text').textContent = '此文章可能已被移除或不存在';
-    
-    // Add back to home link
-    const backLink = clone.querySelector('.back-link');
-    backLink.style.display = 'inline-block';
-    
+    const clone = document.getElementById('error-template').content.cloneNode(true);
+    clone.querySelector('.error-title').textContent = title;
+    clone.querySelector('.error-text').textContent = text;
+    if (retryFn) {
+        const btn = clone.querySelector('.retry-button');
+        btn.style.display = 'inline-block';
+        btn.addEventListener('click', retryFn);
+    }
+    if (showBack) {
+        clone.querySelector('.back-link').style.display = 'inline-block';
+    }
     content.innerHTML = '';
     content.appendChild(clone);
 }
 
-/**
- * Render error state for article detail
- * Requirements: 7.2, 7.5
- * @param {Error} error - Error object
- * @param {string} articleId - Article ID that failed to load
- */
-function renderArticleDetailError(error, articleId) {
-    const content = document.getElementById('content');
-    const template = document.getElementById('error-template');
-    const clone = template.content.cloneNode(true);
-    
-    clone.querySelector('.error-title').textContent = '載入失敗';
-    clone.querySelector('.error-text').textContent = error.message || '無法載入文章，請檢查網路連線';
-    
-    // Show retry button
-    const retryButton = clone.querySelector('.retry-button');
-    retryButton.style.display = 'inline-block';
-    retryButton.addEventListener('click', () => {
-        ErrorLogger.log('User Action', new Error('Retry button clicked'), {
-            action: 'retry',
-            context: 'article-detail',
-            articleId
-        });
-        // Reload current route
-        router.handleRouteChange();
-    });
-    
-    content.innerHTML = '';
-    content.appendChild(clone);
-}
-
-/**
- * Handle 404 not found route
- * Requirements: 7.1
- */
 function handleNotFound() {
-    const content = document.getElementById('content');
-    const template = document.getElementById('error-template');
-    const clone = template.content.cloneNode(true);
-    
-    clone.querySelector('.error-title').textContent = '404 - 找不到頁面';
-    clone.querySelector('.error-text').textContent = '您訪問的頁面不存在';
-    
-    // Show back to home link
-    const backLink = clone.querySelector('.back-link');
-    backLink.style.display = 'inline-block';
-    
-    content.innerHTML = '';
-    content.appendChild(clone);
-    
-    ErrorLogger.log('Route Not Found', new Error('404 - Route not found'), {
-        path: window.location.hash
+    renderError('404 - 找不到頁面', '您訪問的頁面不存在', null, true);
+}
+
+// ===== Search =====
+
+function initializeSearch() {
+    const input = document.getElementById('search-input');
+    const clear = document.getElementById('search-clear');
+    if (!input) return;
+
+    let timer;
+    input.addEventListener('input', (e) => {
+        clear.style.display = e.target.value ? 'block' : 'none';
+        clearTimeout(timer);
+        timer = setTimeout(() => performSearch(e.target.value), 300);
+    });
+    clear.addEventListener('click', () => {
+        input.value = '';
+        clear.style.display = 'none';
+        performSearch('');
+    });
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch(input.value);
     });
 }
 
-// Register routes
+function performSearch(query) {
+    const results = articleSearch.search(query);
+    const folderMap = buildFolderMap(results);
+    activeFolder = '/';
+    renderArticleList(results, folderMap);
+
+    const pageTitle = document.querySelector('.page-title');
+    if (pageTitle) {
+        pageTitle.textContent = query
+            ? `搜尋結果: "${query}" (${results.length} 篇文章)`
+            : `所有文章 (${results.length})`;
+    }
+}
+
+// ===== Routes =====
+
 router.addRoute('/', handleArticleList);
 router.addRoute('/article/:id', handleArticleDetail);
 router.setNotFoundHandler(handleNotFound);
 
-// Global error handler for uncaught errors
-// Requirements: 7.3, 7.5
-window.addEventListener('error', (event) => {
-    ErrorLogger.log('Uncaught Error', event.error || new Error(event.message), {
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno
-    });
-});
+// ===== Init =====
 
-// Global handler for unhandled promise rejections
-// Requirements: 7.4, 7.5
-window.addEventListener('unhandledrejection', (event) => {
-    ErrorLogger.log('Unhandled Promise Rejection', new Error(event.reason), {
-        promise: event.promise
-    });
-});
-
-// ===== Search Functionality =====
-
-/**
- * Initialize search functionality
- */
-function initializeSearch() {
-    const searchInput = document.getElementById('search-input');
-    const searchClear = document.getElementById('search-clear');
-    
-    if (!searchInput) return;
-    
-    let searchTimeout;
-    
-    // Handle search input
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value;
-        
-        // Show/hide clear button
-        if (query) {
-            searchClear.style.display = 'block';
-        } else {
-            searchClear.style.display = 'none';
-        }
-        
-        // Debounce search
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            performSearch(query);
-        }, 300);
-    });
-    
-    // Handle clear button
-    searchClear.addEventListener('click', () => {
-        searchInput.value = '';
-        searchClear.style.display = 'none';
-        performSearch('');
-    });
-    
-    // Handle Enter key
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            performSearch(searchInput.value);
-        }
-    });
-}
-
-/**
- * Perform search and update article list
- * @param {string} query - Search query
- */
-function performSearch(query) {
-    const results = articleSearch.search(query);
-    renderArticleList(results);
-    
-    // Update page title to show search results
-    const content = document.getElementById('content');
-    const pageTitle = content.querySelector('.page-title');
-    if (pageTitle) {
-        if (query) {
-            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章)`;
-        } else {
-            pageTitle.textContent = '所有文章';
-        }
-    }
-}
-
-// Initialize search when DOM is ready
 function initializeApp() {
     initializeSearch();
 }
 
-// Check if DOM is already loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-    // DOM is already loaded, initialize immediately
     initializeApp();
 }
 
-// Export router for use in other modules
-export { router, ErrorLogger, articleSearch };
-
-// Make router available globally for debugging
+export { router, articleSearch };
 window.router = router;

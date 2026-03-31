@@ -1,5 +1,5 @@
 import { mkdir, writeFile, copyFile } from 'fs/promises';
-import { join, dirname, basename } from 'path';
+import { join, dirname, basename, relative } from 'path';
 import { scanMarkdownFiles } from './scanner.js';
 import { parseArticleMetadata } from './parser.js';
 
@@ -11,50 +11,41 @@ import { parseArticleMetadata } from './parser.js';
  */
 export async function generateArticleList(sourceDir, outputDir) {
   try {
-    // Scan for markdown files
     const markdownFiles = await scanMarkdownFiles(sourceDir);
-    
-    // Parse metadata from each file
+
+    // Parse metadata, passing sourceDir so folder is computed correctly
     const articles = await Promise.all(
-      markdownFiles.map(filePath => parseArticleMetadata(filePath))
+      markdownFiles.map(filePath => parseArticleMetadata(filePath, sourceDir))
     );
-    
+
     // Sort articles by date (newest first)
-    articles.sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateB - dateA;
-    });
-    
-    // Create the article list object
-    const articleList = {
-      articles
-    };
-    
-    // Ensure output directories exist
+    articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const articleList = { articles };
+
     const articlesOutputDir = join(outputDir, 'articles');
     await mkdir(articlesOutputDir, { recursive: true });
-    
+
     // Write list.json
-    const listJsonPath = join(articlesOutputDir, 'list.json');
     await writeFile(
-      listJsonPath,
+      join(articlesOutputDir, 'list.json'),
       JSON.stringify(articleList, null, 2),
       'utf-8'
     );
-    
-    // Copy markdown files to output directory
+
+    // Copy markdown files preserving sub-directory structure
     await Promise.all(
       markdownFiles.map(async (filePath) => {
-        const filename = basename(filePath);
-        const destPath = join(articlesOutputDir, filename);
+        const rel = relative(sourceDir, filePath);
+        const destPath = join(articlesOutputDir, rel);
+        await mkdir(dirname(destPath), { recursive: true });
         await copyFile(filePath, destPath);
       })
     );
-    
+
     console.log(`✓ Generated article list with ${articles.length} articles`);
     console.log(`✓ Copied ${markdownFiles.length} markdown files to ${articlesOutputDir}`);
-    
+
     return articleList;
   } catch (error) {
     console.error('Error generating article list:', error.message);
