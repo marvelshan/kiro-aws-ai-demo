@@ -11,22 +11,6 @@ const articleSearch = new ArticleSearch();
 let currentArticles = [];
 let activeFolder = '/'; // currently selected folder
 
-// ===== View Count (localStorage) =====
-
-function getViewKey(articleId) {
-    return `views_${articleId}`;
-}
-
-function getViewCount(articleId) {
-    return parseInt(localStorage.getItem(getViewKey(articleId)) || '0', 10);
-}
-
-function incrementViewCount(articleId) {
-    const count = getViewCount(articleId) + 1;
-    localStorage.setItem(getViewKey(articleId), count);
-    return count;
-}
-
 // ===== Date Formatting =====
 
 function formatDisplayDate(dateString) {
@@ -161,9 +145,6 @@ function renderArticleList(articles, folderMap) {
         const readTimeEl = itemClone.querySelector('.read-time-value');
         if (readTimeEl) readTimeEl.textContent = article.readTime || '—';
 
-        const viewsEl = itemClone.querySelector('.views-count');
-        viewsEl.textContent = getViewCount(article.id);
-
         container.appendChild(itemClone);
     }
 
@@ -206,17 +187,14 @@ async function handleArticleDetail(params) {
         const htmlContent = parseMarkdown(markdownContent);
         const readTime = estimateReadingTime(markdownContent);
 
-        // Increment and get view count
-        const views = incrementViewCount(article.id);
-
-        renderArticleDetail(article, htmlContent, views, readTime);
+        renderArticleDetail(article, htmlContent, readTime);
     } catch (error) {
         renderError('載入失敗', error.message || '無法載入文章，請檢查網路連線',
             () => router.handleRouteChange());
     }
 }
 
-function renderArticleDetail(article, htmlContent, views, readTime) {
+function renderArticleDetail(article, htmlContent, readTime) {
     const content = document.getElementById('content');
     const clone = document.getElementById('article-detail-template').content.cloneNode(true);
 
@@ -229,7 +207,6 @@ function renderArticleDetail(article, htmlContent, views, readTime) {
     const readTimeEl = clone.querySelector('.read-time-value');
     if (readTimeEl) readTimeEl.textContent = readTime || '—';
 
-    clone.querySelector('.views-count').textContent = views;
     clone.querySelector('.article-content').innerHTML = htmlContent;
 
     const backLink = clone.querySelector('.back-link');

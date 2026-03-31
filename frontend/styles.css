@@ -355,8 +355,7 @@ body {
     color: var(--text-tertiary);
 }
 
-.article-read-time,
-.article-views {
+.article-read-time {
     font-size: 13px;
     color: var(--text-tertiary);
     background: var(--bg-tertiary);
@@ -364,12 +363,6 @@ body {
     border-radius: 20px;
     font-weight: 500;
     white-space: nowrap;
-}
-
-.article-views {
-    background: rgba(29, 155, 240, 0.1);
-    color: var(--pacific-blue-light);
-    border: 1px solid rgba(29, 155, 240, 0.2);
 }
 
 @media (max-width: 768px) {

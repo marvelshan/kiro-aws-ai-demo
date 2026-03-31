@@ -14,9 +14,9 @@
 
     const TEXT         = '"Hello, World!"';
     const SUB          = 'Zak 的學習筆記 · AI Infra';
-    const TOTAL_MS     = 3400;  // total time before curtain lifts
-    const TYPE_SPEED   = 58;    // ms per character
-    const TYPE_DELAY   = 900;   // wait before typing starts
+    const TOTAL_MS     = 2000;  // total time before curtain lifts
+    const TYPE_SPEED   = 40;    // ms per character
+    const TYPE_DELAY   = 500;   // wait before typing starts
 
     const typedEl  = document.getElementById('intro-typed');
     const cursorEl = document.querySelector('.intro-cursor');
