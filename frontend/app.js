@@ -5,14 +5,12 @@
 
 import Router from './router.js';
 import ArticleSearch from './search.js';
-import GitHubImporter from './github-importer.js';
 
 // Initialize router
 const router = new Router();
 
-// Initialize search and GitHub importer
+// Initialize search
 const articleSearch = new ArticleSearch();
-const githubImporter = new GitHubImporter();
 
 // Store current articles
 let currentArticles = [];
@@ -155,7 +153,7 @@ function renderArticleList(articles) {
     
     // Update page title
     const pageTitle = listClone.querySelector('.page-title');
-    pageTitle.textContent = '所有文章 (來自 Git Submodule)';
+    pageTitle.textContent = '所有文章';
     
     const articlesContainer = listClone.getElementById('articles-container');
     
@@ -618,195 +616,16 @@ function performSearch(query) {
     const pageTitle = content.querySelector('.page-title');
     if (pageTitle) {
         if (query) {
-            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章) (來自 Git Submodule)`;
+            pageTitle.textContent = `搜尋結果: "${query}" (${results.length} 篇文章)`;
         } else {
-            pageTitle.textContent = '所有文章 (來自 Git Submodule)';
+            pageTitle.textContent = '所有文章';
         }
     }
 }
 
-// ===== GitHub Import Functionality =====
-
-/**
- * Initialize GitHub import functionality
- */
-function initializeGitHubImport() {
-    console.log('Initializing GitHub import...');
-    
-    const importBtn = document.getElementById('github-import-btn');
-    const modal = document.getElementById('github-modal');
-    const closeBtn = document.getElementById('modal-close');
-    const cancelBtn = document.getElementById('import-cancel-btn');
-    const fetchBtn = document.getElementById('import-fetch-btn');
-    const confirmBtn = document.getElementById('import-confirm-btn');
-    const urlInput = document.getElementById('github-url-input');
-    
-    console.log('Elements found:', {
-        importBtn: !!importBtn,
-        modal: !!modal,
-        closeBtn: !!closeBtn,
-        cancelBtn: !!cancelBtn,
-        fetchBtn: !!fetchBtn,
-        confirmBtn: !!confirmBtn,
-        urlInput: !!urlInput
-    });
-    
-    if (!importBtn || !modal) {
-        console.error('Required elements not found!');
-        return;
-    }
-    
-    let fetchedArticles = [];
-    
-    // Open modal
-    importBtn.addEventListener('click', () => {
-        console.log('Import button clicked!');
-        modal.style.display = 'flex';
-        urlInput.focus();
-    });
-    
-    console.log('GitHub import initialized successfully');
-    
-    // Close modal
-    const closeModal = () => {
-        modal.style.display = 'none';
-        urlInput.value = '';
-        document.getElementById('import-status').style.display = 'none';
-        document.getElementById('import-preview').style.display = 'none';
-        confirmBtn.style.display = 'none';
-        fetchBtn.style.display = 'inline-block';
-    };
-    
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-    
-    // Fetch articles from GitHub
-    fetchBtn.addEventListener('click', async () => {
-        const url = urlInput.value.trim();
-        
-        if (!url) {
-            showImportStatus('請輸入 GitHub repository URL', 'error');
-            return;
-        }
-        
-        showImportStatus('正在讀取 repository...', 'loading');
-        fetchBtn.disabled = true;
-        
-        try {
-            fetchedArticles = await githubImporter.importRepository(url);
-            
-            if (fetchedArticles.length === 0) {
-                showImportStatus('未找到任何 markdown 檔案', 'error');
-                fetchBtn.disabled = false;
-                return;
-            }
-            
-            // Show preview
-            showImportPreview(fetchedArticles);
-            showImportStatus(`成功讀取 ${fetchedArticles.length} 篇文章`, 'success');
-            
-            // Show confirm button
-            fetchBtn.style.display = 'none';
-            confirmBtn.style.display = 'inline-block';
-            
-        } catch (error) {
-            showImportStatus(`錯誤: ${error.message}`, 'error');
-            fetchBtn.disabled = false;
-        }
-    });
-    
-    // Confirm import
-    confirmBtn.addEventListener('click', () => {
-        console.log('Confirm import clicked, articles:', fetchedArticles.length);
-        
-        // Update current articles with GitHub articles
-        currentArticles = fetchedArticles;
-        isGitHubMode = true;
-        
-        console.log('Updated currentArticles:', currentArticles.length);
-        console.log('isGitHubMode:', isGitHubMode);
-        
-        // Initialize search with new articles
-        articleSearch.initialize(currentArticles);
-        
-        // Close modal
-        closeModal();
-        
-        // Navigate to home and trigger article list rendering
-        router.navigateHome();
-        
-        // Show success message
-        setTimeout(() => {
-            alert(`成功導入 ${fetchedArticles.length} 篇文章！`);
-        }, 100);
-    });
-}
-
-/**
- * Show import status message
- * @param {string} message - Status message
- * @param {string} type - Message type (loading, success, error)
- */
-function showImportStatus(message, type) {
-    const statusDiv = document.getElementById('import-status');
-    statusDiv.textContent = message;
-    statusDiv.className = `import-status ${type}`;
-    statusDiv.style.display = 'block';
-}
-
-/**
- * Show preview of imported articles
- * @param {Array} articles - Array of article objects
- */
-function showImportPreview(articles) {
-    const previewDiv = document.getElementById('import-preview');
-    const previewList = document.getElementById('preview-list');
-    const articleCount = document.getElementById('article-count');
-    
-    articleCount.textContent = articles.length;
-    
-    // Clear previous preview
-    previewList.innerHTML = '';
-    
-    // Show first 10 articles as preview
-    const previewArticles = articles.slice(0, 10);
-    
-    previewArticles.forEach(article => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        item.innerHTML = `
-            <div class="preview-title">${escapeHtml(article.title)}</div>
-            <div class="preview-meta">
-                <span class="preview-date">${article.date}</span>
-                ${article.tags && article.tags.length > 0 ? 
-                    `<span class="preview-tags">${article.tags.map(t => `#${t}`).join(' ')}</span>` : 
-                    ''}
-            </div>
-        `;
-        previewList.appendChild(item);
-    });
-    
-    if (articles.length > 10) {
-        const more = document.createElement('div');
-        more.className = 'preview-more';
-        more.textContent = `... 還有 ${articles.length - 10} 篇文章`;
-        previewList.appendChild(more);
-    }
-    
-    previewDiv.style.display = 'block';
-}
-
-// Initialize search and GitHub import when DOM is ready
+// Initialize search when DOM is ready
 function initializeApp() {
     initializeSearch();
-    initializeGitHubImport();
 }
 
 // Check if DOM is already loaded
@@ -818,7 +637,7 @@ if (document.readyState === 'loading') {
 }
 
 // Export router for use in other modules
-export { router, ErrorLogger, articleSearch, githubImporter };
+export { router, ErrorLogger, articleSearch };
 
 // Make router available globally for debugging
 window.router = router;

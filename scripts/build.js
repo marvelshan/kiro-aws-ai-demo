@@ -37,7 +37,7 @@ async function copyFrontendFiles() {
   await mkdir(OUTPUT_DIR, { recursive: true });
   
   // List of frontend files to copy
-  const files = ['index.html', 'app.js', 'router.js', 'styles.css', 'search.js', 'github-importer.js'];
+  const files = ['index.html', 'app.js', 'router.js', 'styles.css', 'search.js'];
   
   // Copy each file
   await Promise.all(
