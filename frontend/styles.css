@@ -1295,19 +1295,13 @@ html {
 }
 
 /* ===== Back link arrow animation ===== */
-.back-link::before {
-    content: '←';
-    display: inline-block;
-    margin-right: 6px;
-    transition: transform 0.2s ease;
+.back-link {
+    /* arrow is already in the HTML text, no ::before needed */
 }
 
-.back-link:hover::before {
+.back-link:hover {
     transform: translateX(-4px);
 }
-
-/* Remove the static ← from template since we add it via ::before */
-/* Keep it as-is since template has the text already */
 
 /* ===== Folder Grid (Home Page) ===== */
 
