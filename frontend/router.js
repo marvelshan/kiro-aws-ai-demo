@@ -60,10 +60,9 @@ class Router {
      */
     getCurrentPath() {
         const hash = window.location.hash;
-        // Remove # prefix
         let path = hash.replace(/^#/, '');
-        
-        // Default to / for home if empty
+        // Decode URI components so Chinese/special chars match article IDs
+        try { path = decodeURIComponent(path); } catch {}
         return path || '/';
     }
 

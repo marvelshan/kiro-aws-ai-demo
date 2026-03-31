@@ -48,13 +48,22 @@ export async function parseArticleMetadata(filePath, sourceDir = '') {
 }
 
 /**
- * Generates an ID from the file path
+ * Generates an ID from the file path — ASCII-safe slug
  * @param {string} filePath - Path to the file
  * @returns {string} Generated ID
  */
 function generateId(filePath) {
   const filename = basename(filePath, extname(filePath));
-  return filename.toLowerCase().replace(/\s+/g, '-');
+  // Lowercase, replace spaces/underscores with hyphens, keep only safe chars
+  return filename
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/_/g, '-')
+    // Remove characters that are not alphanumeric, hyphen, or CJK
+    // Keep CJK so titles remain readable, but strip other specials
+    .replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\uff00-\uffef-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 /**
