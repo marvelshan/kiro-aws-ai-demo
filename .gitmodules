@@ -1,3 +1,4 @@
 [submodule "articles"]
 	path = articles
 	url = https://github.com/marvelshan/tech-forum.git
+	branch = main
