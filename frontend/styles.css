@@ -1181,3 +1181,143 @@ html {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-tertiary);
 }
+
+/* ===== Reading Progress Bar ===== */
+#reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #1d9bf0, #4ab3f4, #4ade80);
+    z-index: 200;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(29, 155, 240, 0.6);
+    border-radius: 0 2px 2px 0;
+}
+
+/* ===== Article Header Entrance ===== */
+.article-header {
+    animation: articleHeaderIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes articleHeaderIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Content Scroll Reveal ===== */
+.content-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== Heading Decorations ===== */
+.article-content h2 {
+    position: relative;
+    padding-left: 16px;
+}
+
+.article-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: linear-gradient(180deg, #1d9bf0, #4ab3f4);
+    border-radius: 2px;
+}
+
+.article-content h3 {
+    position: relative;
+    padding-left: 12px;
+}
+
+.article-content h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #1d9bf0;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(29, 155, 240, 0.5);
+}
+
+/* ===== Code Language Label ===== */
+.code-lang {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #1d9bf0;
+    background: rgba(29, 155, 240, 0.12);
+    border: 1px solid rgba(29, 155, 240, 0.25);
+    border-radius: 4px;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+/* Shift copy button right when lang label is present */
+.article-content pre:has(.code-lang) .copy-button {
+    right: 12px;
+}
+
+/* ===== Blockquote Enhancement ===== */
+.article-content blockquote {
+    position: relative;
+    overflow: hidden;
+}
+
+.article-content blockquote::after {
+    content: '"';
+    position: absolute;
+    right: 16px;
+    bottom: -16px;
+    font-size: 80px;
+    line-height: 1;
+    color: rgba(29, 155, 240, 0.12);
+    font-family: Georgia, serif;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ===== Inline code pulse on hover ===== */
+.article-content code:not(pre code) {
+    transition: background 0.2s ease, border-color 0.2s ease;
+    cursor: default;
+}
+
+.article-content code:not(pre code):hover {
+    background: rgba(29, 155, 240, 0.22);
+    border-color: rgba(29, 155, 240, 0.5);
+}
+
+/* ===== Back link arrow animation ===== */
+.back-link::before {
+    content: '←';
+    display: inline-block;
+    margin-right: 6px;
+    transition: transform 0.2s ease;
+}
+
+.back-link:hover::before {
+    transform: translateX(-4px);
+}
+
+/* Remove the static ← from template since we add it via ::before */
+/* Keep it as-is since template has the text already */

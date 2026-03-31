@@ -245,6 +245,76 @@ function renderArticleDetail(article, htmlContent, views, readTime) {
         content.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
     }
     addCopyButtons();
+    addCodeLangLabels();
+    initReadingProgress();
+    initArticleScrollReveal();
+}
+
+// ===== Reading Progress Bar =====
+
+function initReadingProgress() {
+    // Remove any existing bar
+    document.getElementById('reading-progress')?.remove();
+
+    const bar = document.createElement('div');
+    bar.id = 'reading-progress';
+    document.body.appendChild(bar);
+
+    function updateProgress() {
+        const articleEl = document.querySelector('.article-detail');
+        if (!articleEl) return;
+        const rect = articleEl.getBoundingClientRect();
+        const total = articleEl.offsetHeight - window.innerHeight;
+        const scrolled = Math.max(0, -rect.top);
+        const pct = total > 0 ? Math.min(100, (scrolled / total) * 100) : 0;
+        bar.style.width = pct + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+}
+
+// ===== Article Scroll Reveal =====
+
+function initArticleScrollReveal() {
+    const targets = document.querySelectorAll(
+        '.article-content h1, .article-content h2, .article-content h3, ' +
+        '.article-content h4, .article-content p, .article-content pre, ' +
+        '.article-content blockquote, .article-content ul, .article-content ol, ' +
+        '.article-content table, .article-header'
+    );
+
+    targets.forEach(el => el.classList.add('content-reveal'));
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('content-revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    targets.forEach(el => observer.observe(el));
+}
+
+// ===== Code Language Labels =====
+
+function addCodeLangLabels() {
+    document.querySelectorAll('.article-content pre code').forEach(code => {
+        const pre = code.parentElement;
+        if (pre.querySelector('.code-lang')) return;
+
+        // Extract language from hljs class e.g. "language-go"
+        const langClass = [...code.classList].find(c => c.startsWith('language-'));
+        if (!langClass) return;
+        const lang = langClass.replace('language-', '').toUpperCase();
+
+        const label = document.createElement('span');
+        label.className = 'code-lang';
+        label.textContent = lang;
+        pre.appendChild(label);
+    });
 }
 
 // ===== Markdown =====
