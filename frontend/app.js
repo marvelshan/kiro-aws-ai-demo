@@ -42,6 +42,16 @@ function formatDisplayDate(dateString) {
     }
 }
 
+// ===== Reading Time =====
+
+function estimateReadingTime(text) {
+    // Average Chinese reading speed ~300 chars/min, English ~200 words/min
+    const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+    const words = text.replace(/[\u4e00-\u9fff]/g, '').trim().split(/\s+/).filter(Boolean).length;
+    const minutes = Math.ceil(chineseChars / 300 + words / 200);
+    return Math.max(1, minutes);
+}
+
 // ===== Folder Tree =====
 
 /**
@@ -148,6 +158,9 @@ function renderArticleList(articles, folderMap) {
         dateEl.textContent = formatDisplayDate(article.date);
         dateEl.setAttribute('datetime', article.date);
 
+        const readTimeEl = itemClone.querySelector('.read-time-value');
+        if (readTimeEl) readTimeEl.textContent = article.readTime || '—';
+
         const viewsEl = itemClone.querySelector('.views-count');
         viewsEl.textContent = getViewCount(article.id);
 
@@ -189,18 +202,19 @@ async function handleArticleDetail(params) {
 
         const markdownContent = await mdResponse.text();
         const htmlContent = parseMarkdown(markdownContent);
+        const readTime = estimateReadingTime(markdownContent);
 
         // Increment and get view count
         const views = incrementViewCount(article.id);
 
-        renderArticleDetail(article, htmlContent, views);
+        renderArticleDetail(article, htmlContent, views, readTime);
     } catch (error) {
         renderError('載入失敗', error.message || '無法載入文章，請檢查網路連線',
             () => router.handleRouteChange());
     }
 }
 
-function renderArticleDetail(article, htmlContent, views) {
+function renderArticleDetail(article, htmlContent, views, readTime) {
     const content = document.getElementById('content');
     const clone = document.getElementById('article-detail-template').content.cloneNode(true);
 
@@ -209,6 +223,9 @@ function renderArticleDetail(article, htmlContent, views) {
     const dateEl = clone.querySelector('.article-date');
     dateEl.textContent = formatDisplayDate(article.date);
     dateEl.setAttribute('datetime', article.date);
+
+    const readTimeEl = clone.querySelector('.read-time-value');
+    if (readTimeEl) readTimeEl.textContent = readTime || '—';
 
     clone.querySelector('.views-count').textContent = views;
     clone.querySelector('.article-content').innerHTML = htmlContent;
