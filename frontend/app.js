@@ -169,6 +169,8 @@ function renderArticleList(articles, folderMap) {
 
     content.innerHTML = '';
     content.appendChild(listClone);
+    // Trigger scroll-reveal for newly rendered cards
+    requestAnimationFrame(initScrollReveal);
 }
 
 // ===== Article Detail =====
@@ -367,6 +369,24 @@ function performSearch(query) {
 router.addRoute('/', handleArticleList);
 router.addRoute('/article/:id', handleArticleDetail);
 router.setNotFoundHandler(handleNotFound);
+
+// ===== Scroll Reveal =====
+
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                // Stagger each card by 60ms
+                setTimeout(() => {
+                    entry.target.classList.add('revealed');
+                }, i * 60);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.article-item').forEach(el => observer.observe(el));
+}
 
 // ===== Init =====
 
