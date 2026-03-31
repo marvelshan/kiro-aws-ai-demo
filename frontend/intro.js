@@ -1,66 +1,63 @@
 /**
- * Intro overlay animation
- * Typewriter effect → progress bar → fade out → reveal app
+ * Intro overlay — curtain animation
+ * Same gradient as main site → slides UP to reveal the page beneath
  */
 (function () {
-    // Skip intro if already seen this session
+    const overlay = document.getElementById('intro-overlay');
+    const app     = document.getElementById('app');
+
+    // Skip intro on repeat visits within the same session
     if (sessionStorage.getItem('intro_done')) {
-        document.getElementById('intro-overlay').style.display = 'none';
-        document.getElementById('app').classList.add('visible');
+        overlay.remove();
         return;
     }
 
-    const TEXT = '"Hello, World!"';
-    const SUB  = 'Zak 的學習筆記 · AI Infra';
-    const TOTAL_DURATION = 3200; // ms total before fade-out
+    const TEXT         = '"Hello, World!"';
+    const SUB          = 'Zak 的學習筆記 · AI Infra';
+    const TOTAL_MS     = 3400;  // total time before curtain lifts
+    const TYPE_SPEED   = 58;    // ms per character
+    const TYPE_DELAY   = 900;   // wait before typing starts
 
     const typedEl  = document.getElementById('intro-typed');
     const cursorEl = document.querySelector('.intro-cursor');
     const subEl    = document.getElementById('intro-sub');
     const barEl    = document.getElementById('intro-bar');
-    const overlay  = document.getElementById('intro-overlay');
-    const app      = document.getElementById('app');
 
     let charIndex = 0;
-    const TYPE_SPEED = 60; // ms per character
-    const typeDelay  = 800; // wait before typing starts
 
-    // Animate progress bar
+    // ── Progress bar ──
     function startProgressBar() {
-        barEl.style.transitionDuration = TOTAL_DURATION + 'ms';
-        // Force reflow so transition fires
-        barEl.getBoundingClientRect();
+        barEl.style.transitionDuration = TOTAL_MS + 'ms';
+        barEl.getBoundingClientRect(); // force reflow
         barEl.style.width = '100%';
     }
 
-    // Typewriter
+    // ── Typewriter ──
     function typeNext() {
         if (charIndex < TEXT.length) {
-            typedEl.textContent += TEXT[charIndex];
-            charIndex++;
+            typedEl.textContent += TEXT[charIndex++];
             setTimeout(typeNext, TYPE_SPEED);
         } else {
-            // Done typing — show sub text, hide cursor
             cursorEl.classList.add('hidden');
             subEl.textContent = SUB;
             subEl.classList.add('visible');
         }
     }
 
-    // Fade out overlay and reveal app
-    function finishIntro() {
-        overlay.classList.add('fade-out');
-        app.classList.add('visible');
+    // ── Curtain lift ──
+    function liftCurtain() {
+        overlay.classList.add('slide-up');
         sessionStorage.setItem('intro_done', '1');
 
-        // Remove overlay from DOM after transition
-        overlay.addEventListener('transitionend', () => {
-            overlay.remove();
+        overlay.addEventListener('transitionend', (e) => {
+            // Only remove after the transform transition (not opacity of inner)
+            if (e.propertyName === 'transform') {
+                overlay.remove();
+            }
         }, { once: true });
     }
 
-    // Kick off
     startProgressBar();
-    setTimeout(typeNext, typeDelay);
-    setTimeout(finishIntro, TOTAL_DURATION);
+    setTimeout(typeNext, TYPE_DELAY);
+    setTimeout(liftCurtain, TOTAL_MS);
 })();

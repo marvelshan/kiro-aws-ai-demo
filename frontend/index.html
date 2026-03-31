@@ -37,7 +37,7 @@
 
         <footer class="footer">
             <div class="container">
-        <p>&copy; 2024 Zak 的學習筆記. All rights reserved.</p>
+                <p>&copy; 2024 Zak 的學習筆記. All rights reserved.</p>
             </div>
         </footer>
     </div>
@@ -45,12 +45,10 @@
     <!-- Article list template -->
     <template id="article-list-template">
         <div class="article-list-layout">
-            <!-- Sidebar folder tree -->
             <aside class="folder-sidebar">
                 <div class="folder-header">📁 資料夾</div>
                 <div id="folder-tree"></div>
             </aside>
-            <!-- Main article list -->
             <div class="article-list-main">
                 <h2 class="page-title">所有文章</h2>
                 <div id="articles-container"></div>
@@ -114,12 +112,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script type="module" src="app.js"></script>
 
-    <!-- Intro overlay -->
+    <!-- Intro overlay — same gradient as main site, slides up like a curtain -->
     <div id="intro-overlay" aria-hidden="true">
         <div class="intro-inner">
+            <div class="intro-site-name">Zak 的學習筆記</div>
             <div class="intro-label">AI Infra</div>
+            <div class="intro-divider"></div>
             <div class="intro-code">
-                <span class="intro-prompt">$&nbsp;</span><span id="intro-typed"></span><span class="intro-cursor">▋</span>
+                <span class="intro-prompt">$ </span><span id="intro-typed"></span><span class="intro-cursor">▋</span>
             </div>
             <div class="intro-sub" id="intro-sub"></div>
         </div>

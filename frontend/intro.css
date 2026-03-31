@@ -1,55 +1,86 @@
-/* ===== Intro Overlay Animation ===== */
+/* ===== Intro Overlay — seamlessly blends with main site ===== */
 
+/* The overlay uses the SAME gradient as body so there's zero visual jump */
 #intro-overlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: #0a0f1a;
+    background: linear-gradient(135deg, #16537e 0%, #1c2938 50%, #243447 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Curtain: slides UP to reveal the page beneath */
+    transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
 }
 
-#intro-overlay.fade-out {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+#intro-overlay.slide-up {
+    transform: translateY(-100%);
 }
 
+/* ── Inner content ── */
 .intro-inner {
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+    /* Fade out content slightly before curtain lifts */
+    transition: opacity 0.3s ease 0.1s;
 }
 
-/* "AI Infra" label — fades in first */
+#intro-overlay.slide-up .intro-inner {
+    opacity: 0;
+}
+
+/* Site name — matches .site-title in styles.css */
+.intro-site-name {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #f5f5f7;
+    opacity: 0;
+    animation: introFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+}
+
+/* Tag line */
 .intro-label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: #1d9bf0;
     opacity: 0;
-    animation: introFadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+    animation: introFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s forwards;
 }
 
-/* Code line with typewriter */
+/* Divider */
+.intro-divider {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #1d9bf0, #4ab3f4);
+    border-radius: 2px;
+    opacity: 0;
+    animation: introFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+}
+
+/* Typewriter code line */
 .intro-code {
     font-family: "SF Mono", "Fira Code", "Consolas", monospace;
-    font-size: clamp(22px, 4vw, 40px);
+    font-size: clamp(18px, 3.5vw, 32px);
     font-weight: 600;
-    color: #f5f5f7;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
     opacity: 0;
-    animation: introFadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+    animation: introFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.65s forwards;
     min-height: 1.4em;
+    /* Matches code styling in styles.css */
+    background: rgba(29, 155, 240, 0.08);
+    border: 1px solid rgba(29, 155, 240, 0.25);
+    border-radius: 12px;
+    padding: 12px 24px;
 }
 
 .intro-prompt {
@@ -62,37 +93,37 @@
 }
 
 .intro-cursor {
-    color: #1d9bf0;
-    animation: blink 0.8s step-end infinite;
-    line-height: 1;
+    color: #4ab3f4;
+    animation: blink 0.75s step-end infinite;
 }
 
 .intro-cursor.hidden {
     opacity: 0;
+    animation: none;
 }
 
 /* Sub text */
 .intro-sub {
-    font-size: 15px;
+    font-size: 14px;
     color: #8e8e93;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     opacity: 0;
     transition: opacity 0.5s ease;
-    min-height: 1.4em;
+    min-height: 1.2em;
 }
 
 .intro-sub.visible {
     opacity: 1;
 }
 
-/* Progress bar at bottom */
+/* Progress bar — same accent as site */
 .intro-progress {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 2px;
-    background: rgba(29, 155, 240, 0.15);
+    height: 3px;
+    background: rgba(29, 155, 240, 0.12);
 }
 
 #intro-bar {
@@ -100,42 +131,32 @@
     width: 0%;
     background: linear-gradient(90deg, #1d9bf0, #4ab3f4);
     transition: width linear;
-    box-shadow: 0 0 8px rgba(29, 155, 240, 0.6);
+    box-shadow: 0 0 10px rgba(29, 155, 240, 0.5);
 }
 
-/* Keyframes */
+/* ── Keyframes ── */
 @keyframes introFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    50%       { opacity: 0; }
 }
 
-/* Main app hidden until intro done */
+/* ── Main app: visible from the start, sits BEHIND the overlay ── */
+/* No opacity trick needed — curtain slides away to reveal it */
 #app {
-    opacity: 0;
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#app.visible {
     opacity: 1;
 }
 
-/* Scroll-reveal for article cards */
+/* ── Scroll-reveal for article cards ── */
 .article-item {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .article-item.revealed {
