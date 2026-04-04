@@ -3,9 +3,15 @@
 <p align="center">記錄自己寫的一些技術文章</p>
 
 <p align="center">
-  <a href="https://marvelshan.github.io/kiro-aws-ai-demo/"><img alt="Blog" src="https://img.shields.io/badge/Blog-線上閱讀-1d9bf0?style=flat"></a>
-  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
   <img alt="Built with" src="https://img.shields.io/badge/Built_with-GitHub_Pages-222?logo=github">
+</p>
+
+<p align="center">
+  https://marvelshan.github.io/kiro-aws-ai-demo/
+</p>
+
+<p align="center">
+  <img src="./image.png" width="70%" alt="blog preview">
 </p>
 
 ## 功能特色
