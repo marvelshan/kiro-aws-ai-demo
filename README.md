@@ -1,8 +1,8 @@
-# 靜態部落格系統
+# marvelshan 的技術部落格
 
 https://marvelshan.github.io/kiro-aws-ai-demo/
 
-使用 Git Submodule 從外部 repository 載入 Markdown 文章，透過 GitHub Pages 和原生 JavaScript 建構。
+記錄自己寫的一些技術文章，使用 GitHub Pages 和原生 JavaScript 建構，文章透過 Git Submodule 管理。
 
 ## 功能特色
 
