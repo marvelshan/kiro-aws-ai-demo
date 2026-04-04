@@ -40,6 +40,8 @@
 - 程式碼區塊語法高亮
 - 簡潔的介面設計
 - 即時文章搜尋功能 - 可搜尋標題、內容和標籤
+- 進場動畫 Intro Overlay：網站載入時顯示品牌動畫，顏色與主題一致，完成後以滑動方式揭開頁面
+- 文章卡片 Scroll-Reveal：文章列表捲動進入視窗時淡入滑上，提升閱讀體驗
 
 ## 架構
 
@@ -180,7 +182,8 @@ git commit -m "鎖定文章內容到特定版本"
 │   ├── router.js        # 客戶端路由（hash-based）
 │   ├── search.js        # 搜尋功能
 │   ├── github-importer.js # GitHub repository 資訊顯示
-│   └── styles.css       # 響應式樣式
+│   ├── styles.css       # 響應式樣式
+│   └── intro.css        # 進場動畫 Overlay 樣式與 Scroll-Reveal
 ├── scripts/             # 建置和部署腳本
 │   ├── build.js         # 主要建置協調器（使用 submodule）
 │   ├── scanner.js       # 掃描 articles/ 目錄中的 .md 檔案
