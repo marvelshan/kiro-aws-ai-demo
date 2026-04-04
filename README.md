@@ -1,8 +1,12 @@
-# marvelshan 的技術部落格
+<h2 align="center">marvelshan 的技術部落格</h2>
 
-https://marvelshan.github.io/kiro-aws-ai-demo/
+<p align="center">記錄自己寫的一些技術文章</p>
 
-記錄自己寫的一些技術文章，使用 GitHub Pages 和原生 JavaScript 建構，文章透過 Git Submodule 管理。
+<p align="center">
+  <a href="https://marvelshan.github.io/kiro-aws-ai-demo/"><img alt="Blog" src="https://img.shields.io/badge/Blog-線上閱讀-1d9bf0?style=flat"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <img alt="Built with" src="https://img.shields.io/badge/Built_with-GitHub_Pages-222?logo=github">
+</p>
 
 ## 功能特色
 
